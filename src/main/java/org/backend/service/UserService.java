@@ -33,8 +33,8 @@ public class UserService {
     public UserDto registration(NewUserDto newUser) {
 
         if (userRepository.existsByEmail(newUser.getEmail())) {
-            throw new AlreadyExistException("Пользователь с email: "
-                            + newUser.getEmail() + " уже зарегистрирован");
+            throw new AlreadyExistException("User with email: "
+                            + newUser.getEmail() + " already registered");
         }
 
         User user = User.builder()
@@ -88,7 +88,7 @@ public class UserService {
         ConfirmationCode code = confirmationCodeRepository
                 .findByCodeAndExpiredDateTimeAfter(confirmCode, LocalDateTime.now())
                 .orElseThrow(() -> new NotFoundException(
-                        "Код подтверждения не найден или его срок действия истек"));
+                        "Verification code not found or expired"));
 
         code.setConfirmed(true);
         confirmationCodeRepository.save(code);
@@ -108,8 +108,8 @@ public class UserService {
 
     public UserDto getUserById(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь с ID "
-                        + userId + " не найден"));
+                .orElseThrow(() -> new NotFoundException("User with ID "
+                        + userId + " not found"));
         return UserDto.from(user);
     }
 
@@ -117,8 +117,8 @@ public class UserService {
     @Transactional
     public UserDto makeUserBanned(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("Пользователь с email "
-                        + email + " не найден"));
+                .orElseThrow(() -> new NotFoundException("User with email "
+                        + email + " not found"));
 
         user.setState(User.State.BANNED);
         userRepository.save(user);
@@ -132,8 +132,8 @@ public class UserService {
 
     public List<ConfirmationCode> findCodesByUser(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("Пользователь с email "
-                        + email + " не найден"));
+                .orElseThrow(() -> new NotFoundException("User with email "
+                        + email + " not found"));
 
         return confirmationCodeRepository.findByUser(user);
     }

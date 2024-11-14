@@ -17,12 +17,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/api/users")
 public interface UserApi {
 
-    @Operation(summary = "Получение информации о пользователе по ID")
+    @Operation(summary = "Getting user information by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Информация о пользователе",
+            @ApiResponse(responseCode = "200", description = "User information",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = UserDto.class))),
-            @ApiResponse(responseCode = "404", description = "Пользователь не найден",
+            @ApiResponse(responseCode = "404", description = "User not found",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponseDto.class)))
     }

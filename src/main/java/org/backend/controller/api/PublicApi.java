@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/public")
 public interface PublicApi {
 
-    @Operation(summary = "Регистрация пользователя", description = "операция доступна всем, роль по умолчанию - USER")
+    @Operation(summary = "User registration", description = "operation is available to everyone, default role - USER")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Пользователь успешно зарегистрирован",
+            @ApiResponse(responseCode = "201", description = "User registered successfully",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = UserDto.class))),
-            @ApiResponse(responseCode = "400", description = "Ошибка валидации",
+            @ApiResponse(responseCode = "400", description = "Validation error",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponseDto.class)))
     }
