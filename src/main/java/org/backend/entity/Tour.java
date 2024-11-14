@@ -3,6 +3,8 @@ package org.backend.entity;
 import jakarta.persistence.*;
 import liquibase.datatype.core.DecimalType;
 
+import java.time.LocalDate;
+
 public class Tour {
     public enum State {
         AVAILABLE,
@@ -16,23 +18,24 @@ public class Tour {
     @Column(length = 70)
     private String title;
 
-    @Column(length = 470)
+    @Column(length = 255)
     private String description;
 
 
-    @Column(length = 10, nullable = false)
+    @Column(nullable = false)
     private Long price;
 
     @Column(length = 10)
     private Long duration;
 
-    @Column (nullable = false)
-    private DecimalType startDate;
+    @Column(nullable = false)
+    private LocalDate startDate;
 
-    @Column (nullable = false)
-    private DecimalType endDate;
+    @Column(nullable = false)
+    private LocalDate endDate;
 
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
-    private User.State state;
+    private
+    State state;
 }
