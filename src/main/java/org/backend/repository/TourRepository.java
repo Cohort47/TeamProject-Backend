@@ -26,7 +26,6 @@ public interface TourRepository extends JpaRepository<Tour,Long> {
 
 
 
-
     Optional<Tour> findTourByState(String tourState);
 
     boolean existsByState(Tour.State state);
