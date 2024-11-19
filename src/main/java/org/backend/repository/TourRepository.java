@@ -18,15 +18,11 @@ public interface TourRepository extends JpaRepository<Tour,Long> {
 
 
 
-    Optional<Tour>putTourById(Long id);
-
-
 
     Optional<Tour> findByTitle(String title);
 
     boolean existsByTitle(String title);
 
-    Optional<Tour>putTourByTitle(String title);
 
 
 
