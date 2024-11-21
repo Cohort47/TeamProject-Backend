@@ -9,6 +9,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserRequestDto {
-    @NotBlank(message = "User name is required")
-    private String userName;
+    @NotBlank(message = "User firstName is required")
+    private String userFirstName;
+
+    @NotBlank(message = "User lastName is required")
+    private String userLastName;
+
+    @NotBlank(message = "User email is required")
+    private String email;
 }

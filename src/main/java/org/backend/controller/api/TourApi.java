@@ -12,10 +12,12 @@ import org.backend.entity.Tour;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@RequestMapping("/api/tours")
 public interface TourApi {
 
     ResponseEntity<List<TourDto>> findAll();
@@ -52,9 +54,6 @@ public interface TourApi {
 
     @GetMapping("/{tourEndDate}")
     public ResponseEntity<TourDto> getTourByEndDate(@PathVariable LocalDate tourEndDate);
-
-
-
 
     // можно добавить updateTour
     /*

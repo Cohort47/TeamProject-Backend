@@ -3,11 +3,13 @@ package org.backend.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.backend.controller.api.TourApi;
-
 import org.backend.dto.tourDto.TourDto;
 import org.backend.entity.Tour;
 import org.backend.service.TourService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
@@ -20,6 +22,7 @@ public class TourController implements TourApi {
 
 
     private final TourService service;
+    private final TourService tourService;
 
     @Override
     public ResponseEntity<List<TourDto>> findAll() {
@@ -67,4 +70,9 @@ public class TourController implements TourApi {
     public ResponseEntity<TourDto> getTourByEndDate(LocalDate tourEndDate) {
         return ResponseEntity.ok(service.getTourByEndDate(tourEndDate));
     }
+
+    @PutMapping("/{tourId}")
+    public ResponseEntity<Tour> updateTourState(@PathVariable Long tourId, @RequestParam Tour.State newState) {
+        Tour updatedTour = tourService.updateTourState(tourId, newState);
+        return ResponseEntity.ok(updatedTour); }
 }
