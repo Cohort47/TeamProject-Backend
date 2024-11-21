@@ -14,7 +14,11 @@ public class UserCreateRequestDto {
 
     @NotBlank(message = "User name should not be empty")
     @Size(min = 2, max = 15)
-    private String userName;
+    private String userFirstName;
+
+    @NotBlank(message = "User name should not be empty")
+    @Size(min = 2, max = 15)
+    private String userLastName;
 
     @NotBlank(message = "Password should not be empty")
     @Size(min = 8, max = 25)

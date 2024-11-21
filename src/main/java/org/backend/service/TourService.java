@@ -51,10 +51,6 @@ public class TourService {
         Tour tour = tourRepository.findByTitle(title)
                 .orElseThrow(() -> new NotFoundException("Tour with title "
                         + title + " not found"));
-
-        tour.setState(Tour.State.CLOSED);
-        tourRepository.save(tour);
-
         return TourDto.from(tour);
     }
 
@@ -62,10 +58,6 @@ public class TourService {
         Tour tour = tourRepository.findTourByState(tourState)
                 .orElseThrow(() -> new NotFoundException("Tour with state "
                         + tourState + " not found"));
-
-        tour.setState(Tour.State.CLOSED);
-        tourRepository.save(tour);
-
         return TourDto.from(tour);
     }
 
@@ -95,6 +87,17 @@ public class TourService {
                 .orElseThrow(() -> new NotFoundException("Tour with EndDate "
                         + tourEndDate + " not found"));
         return TourDto.from(tour);
+    }
+
+    public Tour updateTourState(Long tourId, Tour.State newState) {
+        Tour tour = tourRepository
+                .findById(tourId)
+                .orElseThrow(() -> new NotFoundException("Tour with ID "
+                        + tourId + " not found"));
+        tour.setState(newState);
+        return tourRepository.save(tour);
+
+
     }
 }
 

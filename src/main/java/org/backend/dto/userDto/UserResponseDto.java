@@ -11,7 +11,8 @@ import org.backend.entity.User;
 public class UserResponseDto {
 
     private Long id;
-    private String userName;
+    private String userFirstName;
+    private String userLastName;
     private String email;
     private User.Role role;
 }
