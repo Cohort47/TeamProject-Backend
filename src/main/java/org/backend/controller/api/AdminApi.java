@@ -19,14 +19,14 @@ public interface AdminApi {
     @DeleteMapping("/users/{userId}")
     ResponseEntity<List<UserDto>> deleteUser(@PathVariable Long userId);
 
-    @GetMapping("/bann")
+    @GetMapping("/ban")
     ResponseEntity<UserDto> makeUserBan(@RequestParam String email);
 
 
-    @GetMapping("/users/fullDetails")
+    @GetMapping("/users/full-details")
     ResponseEntity<List<User>> findAllFull();
 
-    @GetMapping("/users/allCodes")
+    @GetMapping("/users/all-codes")
     ResponseEntity<List<ConfirmationCode>> findAllCodes(@RequestParam String email);
 
 
