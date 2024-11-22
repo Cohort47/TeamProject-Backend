@@ -26,6 +26,8 @@ public class TourDto {
     private LocalDate startDate;
     private LocalDate endDate;
     private Tour.State state;
+    private String country;
+    private String city;
 
     public static TourDto from(Tour tour){
         return TourDto.builder()
@@ -37,6 +39,8 @@ public class TourDto {
                 .startDate(tour.getStartDate())
                 .startDate(tour.getEndDate())
                 .state(tour.getState())
+                .country(tour.getCountry())
+                .city(tour.getCity())
 
                 .build();
     }

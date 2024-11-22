@@ -45,4 +45,10 @@ public interface TourRepository extends JpaRepository<Tour,Long> {
     Optional<Tour> findByStartDate(LocalDate tourStartDate);
 
     Optional<Tour> findByEndDate(LocalDate tourEndDate);
+
+    Optional<Tour>  findTourByCountry(String tourCountry);
+    boolean existsTourByCountry(String tourCountry);
+
+    Optional<Tour>  findTourByCity(String tourCity);
+    boolean existsTourByCity(String tourCity);
 }

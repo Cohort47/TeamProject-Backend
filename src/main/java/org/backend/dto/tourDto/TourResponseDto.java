@@ -21,4 +21,8 @@ public class TourResponseDto {
     private LocalDate startDate;
     private LocalDate endDate;
     private Tour.State state;
+    private String country;
+    private String city;
+    private String imageUrl;
+
 }

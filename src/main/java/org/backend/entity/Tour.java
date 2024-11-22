@@ -31,7 +31,7 @@ public class Tour {
     @Column(length = 70)
     private String title;
 
-    @Column(length = 255)
+    @Column(nullable = false)
     private String description;
 
 
@@ -52,4 +52,11 @@ public class Tour {
     private Tour.State state;
 
     private String photoLink;
+
+    @Column(nullable = false)
+    private String country;
+
+    @Column(nullable = false)
+    private String city;
+
 }

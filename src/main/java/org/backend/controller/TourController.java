@@ -29,8 +29,6 @@ public class TourController implements TourApi {
         return ResponseEntity.ok(service.findAll());
     }
 
-
-
     @Override
     public ResponseEntity<List<Tour>> findAllFull() {
         return ResponseEntity.ok(service.findAllFull());
@@ -42,8 +40,8 @@ public class TourController implements TourApi {
     }
 
     @Override
-    public ResponseEntity<TourDto> getTourByTitle(String tourTitle) {
-        return ResponseEntity.ok(service.getTourByTitle(tourTitle));
+    public ResponseEntity<TourDto> getTourByTitle(String title) {
+        return ResponseEntity.ok(service.getTourByTitle(title));
     }
 
     @Override
@@ -52,27 +50,37 @@ public class TourController implements TourApi {
     }
 
     @Override
-    public ResponseEntity<TourDto> getTourByPrice(long tourPrice) {
-        return ResponseEntity.ok(service.getTourByPrice(tourPrice));
+    public ResponseEntity<TourDto> getTourByPrice(long price) {
+        return ResponseEntity.ok(service.getTourByPrice(price));
     }
 
     @Override
-    public ResponseEntity<TourDto> getTourByDuration(long tourDuration) {
-        return ResponseEntity.ok(service.getTourByDuration(tourDuration));
+    public ResponseEntity<TourDto> getTourByDuration(long duration) {
+        return ResponseEntity.ok(service.getTourByDuration(duration));
     }
 
     @Override
-    public ResponseEntity<TourDto> getTourByStartDate(LocalDate tourStartDate) {
-        return ResponseEntity.ok(service.getTourByStartDate(tourStartDate));
+    public ResponseEntity<TourDto> getTourByStartDate(LocalDate startDate) {
+        return ResponseEntity.ok(service.getTourByStartDate(startDate));
     }
 
     @Override
-    public ResponseEntity<TourDto> getTourByEndDate(LocalDate tourEndDate) {
-        return ResponseEntity.ok(service.getTourByEndDate(tourEndDate));
+    public ResponseEntity<TourDto> getTourByEndDate(LocalDate endDate) {
+        return ResponseEntity.ok(service.getTourByEndDate(endDate));
     }
 
     @PutMapping("/{tourId}")
     public ResponseEntity<Tour> updateTourState(@PathVariable Long tourId, @RequestParam Tour.State newState) {
         Tour updatedTour = tourService.updateTourState(tourId, newState);
         return ResponseEntity.ok(updatedTour); }
+
+    @Override
+    public ResponseEntity<TourDto> getTourByCountry(String country) {
+        return ResponseEntity.ok(service.getTourByCountry(country));
+    }
+
+    @Override
+    public ResponseEntity<TourDto> getTourByCity(String city) {
+        return ResponseEntity.ok(service.getTourByCity(city));
+    }
 }

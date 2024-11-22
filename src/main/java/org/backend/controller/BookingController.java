@@ -37,8 +37,8 @@ public class BookingController implements BookingApi {
         return ResponseEntity.noContent().build(); }
 
     @GetMapping("/{bookingId}")
-    public ResponseEntity<Booking> getBooking(@PathVariable Long bookingId) {
-        Booking booking = bookingService.getBooking(bookingId);
+    public ResponseEntity<BookingDto> getBooking(@PathVariable Long bookingId) {
+        BookingDto booking = bookingService.getBooking(bookingId);
         return ResponseEntity.ok(booking); }
 
 
