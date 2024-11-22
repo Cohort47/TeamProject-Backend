@@ -34,6 +34,14 @@ public class TourRequestDto {
 
     @NotBlank(message = "Tour.State is required")
     private Tour.State state;
+
+    @NotBlank(message = "country is required")
+    private String country;
+
+    @NotBlank(message = "city is required")
+    private String city;
+
+    private String imageUrl;
 }
 
 

@@ -25,7 +25,8 @@ public class BookingDto {
                 .id(booking.getId())
                 .userId(booking.getUserId())
                 .tourId(booking.getTourId())
-                .state(booking.getState().toString())
+                .state(booking.getState()
+                .toString())
                 .build();
 
     }

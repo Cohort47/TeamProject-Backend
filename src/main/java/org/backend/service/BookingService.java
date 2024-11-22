@@ -48,11 +48,12 @@ public class BookingService {
     }
 
     @Transactional
-    public Booking getBooking (Long bookingId){
-           return bookingRepository.findById(bookingId)
-                   .orElseThrow(() -> new NotFoundException("Booking with ID "
-                           + bookingId + " not found"));
-        }
+    public BookingDto getBooking(Long bookingId) {
+        Booking booking = bookingRepository
+                .findById(bookingId)
+                .orElseThrow(() -> new NotFoundException("Booking with ID "
+                        + bookingId + " not found"));
+        return BookingDto.from(booking); }
 
     public List<Booking> findAllFull() {
         return bookingRepository.findAll();

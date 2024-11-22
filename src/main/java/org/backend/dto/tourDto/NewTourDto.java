@@ -1,6 +1,7 @@
 package org.backend.dto.tourDto;
 
 
+
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,6 +33,13 @@ public class NewTourDto {
     @NotBlank (message = "Tour endDate should not be empty")
     private LocalDate endDate;
 
+    @NotBlank (message = "Tour country should not be empty")
+    private String country;
+
+    @NotBlank (message = "Tour city should not be empty")
+    private String city;
+
+    private String imageUrl;
 }
 
 
