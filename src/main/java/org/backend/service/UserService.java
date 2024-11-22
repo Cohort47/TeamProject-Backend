@@ -6,24 +6,31 @@ import lombok.extern.slf4j.Slf4j;
 import org.backend.dto.userDto.NewUserDto;
 import org.backend.dto.userDto.UserDto;
 import org.backend.entity.ConfirmationCode;
+import org.backend.entity.Role;
 import org.backend.entity.User;
 import org.backend.repository.ConfirmationCodeRepository;
 import org.backend.repository.UserRepository;
 import org.backend.service.exception.AlreadyExistException;
 import org.backend.service.exception.NotFoundException;
 import org.backend.service.mail.MailUtil;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserService {
+public class UserService implements UserDetailsService {
 
+
+    private final RoleService roleService;
     private final UserRepository userRepository;
     private final ConfirmationCodeRepository confirmationCodeRepository;
     private final MailUtil mailUtil;
@@ -37,13 +44,16 @@ public class UserService {
                             + newUser.getEmail() + " already registered");
         }
 
+        Role defaultRole = roleService.findByRoleName("USER");
+
         User user = User.builder()
+
                 .email(newUser.getEmail())
                 .firstName(newUser.getFirstName())
                 .lastName(newUser.getLastName())
                 .hashPassword(newUser.getHashPassword())
-                .role(User.Role.USER)
                 .state(User.State.NOT_CONFIRMED)
+                .roles(Arrays.asList(defaultRole))
                 .build();
 
         userRepository.save(user);
@@ -140,6 +150,39 @@ public class UserService {
 
     public void deleteUserById(Long userId) {
         // Удаление пользователя по id
-         userRepository.deleteById(userId); }
+         userRepository.deleteById(userId);
     }
+
+    //userSecurity
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+
+        if (userOptional.isEmpty()) {
+            throw new UsernameNotFoundException("Invalid username");
+        }
+
+        User user = userOptional.get();
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(), // анлог login
+                user.getHashPassword(),
+                // нужно добавить роли
+                mapRolesToAuthorities(user.getRoles())
+        );
+
+
+    }
+
+    private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles){
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .toList();
+    }
+}
+
+
+
+
+
 
