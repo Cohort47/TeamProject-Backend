@@ -53,6 +53,7 @@ public class BookingController implements BookingApi {
     }
 
     @Override
+    @GetMapping("/{bookingId}/dto")
     public ResponseEntity<BookingDto> getBookingById(long bookingId) {
         return ResponseEntity.ok(bookingService.getBookingById(bookingId));
     }

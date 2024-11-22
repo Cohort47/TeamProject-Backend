@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -34,11 +35,12 @@ public interface TourApi {
                             schema = @Schema(implementation = ErrorResponseDto.class)))
     }
     )
+    // /api/tours?title=example&tourState=example2
     @GetMapping("/{tourId}")
     public ResponseEntity<TourDto> getTourById(@PathVariable long tourId);
 
     @GetMapping("/{title}")
-    public ResponseEntity<TourDto> getTourByTitle(@PathVariable String title);
+    public ResponseEntity<TourDto> getTourByTitle(@RequestParam String title);
 
     @GetMapping("/{tourState}")
     public ResponseEntity<TourDto> getTourByState(@PathVariable String tourState);
