@@ -27,10 +27,8 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserService implements UserDetailsService {
+public class UserService{
 
-
-    private final RoleService roleService;
     private final UserRepository userRepository;
     private final ConfirmationCodeRepository confirmationCodeRepository;
     private final MailUtil mailUtil;
@@ -44,7 +42,6 @@ public class UserService implements UserDetailsService {
                             + newUser.getEmail() + " already registered");
         }
 
-        Role defaultRole = roleService.findByRoleName("USER");
 
         User user = User.builder()
 
@@ -53,7 +50,7 @@ public class UserService implements UserDetailsService {
                 .lastName(newUser.getLastName())
                 .hashPassword(newUser.getHashPassword())
                 .state(User.State.NOT_CONFIRMED)
-                .roles(Arrays.asList(defaultRole))
+                .role(User.Role.USER)
                 .build();
 
         userRepository.save(user);
@@ -153,32 +150,7 @@ public class UserService implements UserDetailsService {
          userRepository.deleteById(userId);
     }
 
-    //userSecurity
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Optional<User> userOptional = userRepository.findByEmail(email);
 
-        if (userOptional.isEmpty()) {
-            throw new UsernameNotFoundException("Invalid username");
-        }
-
-        User user = userOptional.get();
-
-        return new org.springframework.security.core.userdetails.User(
-                user.getEmail(), // анлог login
-                user.getHashPassword(),
-                // нужно добавить роли
-                mapRolesToAuthorities(user.getRoles())
-        );
-
-
-    }
-
-    private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles){
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName()))
-                .toList();
-    }
 }
 
 

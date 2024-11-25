@@ -16,10 +16,10 @@ import java.util.Collection;
 @Table(name = "user", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
 public class User {
 
-//    public enum Role {
-//        ADMIN,
-//        USER
-//    }
+    public enum Role {
+        ADMIN,
+        USER
+    }
 
     public enum State {
         NOT_CONFIRMED,
@@ -43,15 +43,15 @@ public class User {
     @Column(nullable = false)
     private String hashPassword;
 
-//    @Column(nullable = false)
-//    @Enumerated(value = EnumType.STRING)
-//    private Role role;
+    @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
+    private Role role;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "users_role",
-    joinColumns = @JoinColumn(name = "user_id", referencedColumnName ="id"),
-    inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
-    private Collection<Role> roles;
+//    @ManyToMany(fetch = FetchType.EAGER)
+//    @JoinTable(name = "users_role",
+//    joinColumns = @JoinColumn(name = "user_id", referencedColumnName ="id"),
+//    inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+//    private Collection<Role> roles;
 
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)

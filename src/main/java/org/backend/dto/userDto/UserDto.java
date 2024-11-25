@@ -25,7 +25,7 @@ public class UserDto {
     private String firstName;
     private String lastName;
     private String email;
-    private Collection<Role> roles;
+    private String roles;
 
     public static UserDto from(User user){
         return UserDto.builder()
@@ -33,7 +33,7 @@ public class UserDto {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())
-                .roles(user.getRoles())
+                .roles(user.getRole().toString())
                 .build();
     }
 
