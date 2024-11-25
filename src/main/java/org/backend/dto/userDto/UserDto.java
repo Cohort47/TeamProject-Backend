@@ -7,9 +7,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.backend.entity.Role;
 import org.backend.entity.User;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -20,10 +24,8 @@ public class UserDto {
     private Long id;
     private String firstName;
     private String lastName;
-
     private String email;
-
-    private String role;
+    private String roles;
 
     public static UserDto from(User user){
         return UserDto.builder()
@@ -31,7 +33,7 @@ public class UserDto {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())
-                .role(user.getRole().toString())
+                .roles(user.getRole().toString())
                 .build();
     }
 
