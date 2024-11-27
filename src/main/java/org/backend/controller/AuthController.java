@@ -20,9 +20,9 @@ public class AuthController implements AuthApi {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider tokenProvider;
 
-
     @Override
     public ResponseEntity<AuthResponse> authenticate(AuthRequest request) {
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getUserEmail(),

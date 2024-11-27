@@ -6,18 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.backend.dto.userDto.NewUserDto;
 import org.backend.dto.userDto.UserDto;
 import org.backend.entity.ConfirmationCode;
-import org.backend.entity.Role;
 import org.backend.entity.User;
 import org.backend.repository.ConfirmationCodeRepository;
 import org.backend.repository.UserRepository;
 import org.backend.service.exception.AlreadyExistException;
 import org.backend.service.exception.NotFoundException;
 import org.backend.service.mail.MailUtil;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +27,7 @@ public class UserService{
     private final UserRepository userRepository;
     private final ConfirmationCodeRepository confirmationCodeRepository;
     private final MailUtil mailUtil;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Transactional
@@ -48,8 +44,8 @@ public class UserService{
                 .email(newUser.getEmail())
                 .firstName(newUser.getFirstName())
                 .lastName(newUser.getLastName())
-                .hashPassword(newUser.getHashPassword())
-                .state(User.State.NOT_CONFIRMED)
+                .hashPassword(passwordEncoder.encode(newUser.getHashPassword()))
+                .state(User.State.CONFIRMED)
                 .role(User.Role.USER)
                 .build();
 
