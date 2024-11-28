@@ -6,6 +6,7 @@ import org.backend.controller.api.TourApi;
 import org.backend.dto.tourDto.TourDto;
 import org.backend.entity.Tour;
 import org.backend.service.TourService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -20,67 +21,63 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TourController implements TourApi {
 
-
-    private final TourService service;
     private final TourService tourService;
+
 
     @Override
     public ResponseEntity<List<TourDto>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+        return ResponseEntity.ok(tourService.findAll());
     }
 
     @Override
     public ResponseEntity<List<Tour>> findAllFull() {
-        return ResponseEntity.ok(service.findAllFull());
+        return ResponseEntity.ok(tourService.findAllFull());
     }
 
     @Override
-    public ResponseEntity<TourDto> getTourById(long tourId) {
-        return ResponseEntity.ok(service.getTourById(tourId));
+    public ResponseEntity<TourDto> getTourById(@PathVariable long tourId) {
+        return ResponseEntity.ok(tourService.getTourById(tourId));
     }
 
     @Override
-    public ResponseEntity<TourDto> getTourByTitle(String title) {
-        return ResponseEntity.ok(service.getTourByTitle(title));
+    public ResponseEntity<List<TourDto>> getToursByTitle(@PathVariable String title) {
+        return ResponseEntity.ok(tourService.getToursByTitle(title));
     }
 
     @Override
-    public ResponseEntity<TourDto> getTourByState(String tourState) {
-        return ResponseEntity.ok(service.getTourByState(tourState));
+    public ResponseEntity<List<TourDto>> getToursByState(@PathVariable String tourState) {
+        return ResponseEntity.ok(tourService.getToursByState(tourState));
     }
 
     @Override
-    public ResponseEntity<TourDto> getTourByPrice(long price) {
-        return ResponseEntity.ok(service.getTourByPrice(price));
+    public ResponseEntity<List<TourDto>> getToursByPrice(@PathVariable long price) {
+        return ResponseEntity.ok(tourService.getToursByPrice(price));
     }
 
     @Override
-    public ResponseEntity<TourDto> getTourByDuration(long duration) {
-        return ResponseEntity.ok(service.getTourByDuration(duration));
+    public ResponseEntity<List<TourDto>> getToursByDuration(@PathVariable long duration) {
+        return ResponseEntity.ok(tourService.getToursByDuration(duration));
     }
 
     @Override
-    public ResponseEntity<TourDto> getTourByStartDate(LocalDate startDate) {
-        return ResponseEntity.ok(service.getTourByStartDate(startDate));
+    public ResponseEntity<List<TourDto>> getToursByStartDate(
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate) {
+        return ResponseEntity.ok(tourService.getToursByStartDate(startDate));
     }
 
     @Override
-    public ResponseEntity<TourDto> getTourByEndDate(LocalDate endDate) {
-        return ResponseEntity.ok(service.getTourByEndDate(endDate));
-    }
-
-    @PutMapping("/{tourId}")
-    public ResponseEntity<Tour> updateTourState(@PathVariable Long tourId, @RequestParam Tour.State newState) {
-        Tour updatedTour = tourService.updateTourState(tourId, newState);
-        return ResponseEntity.ok(updatedTour); }
-
-    @Override
-    public ResponseEntity<TourDto> getTourByCountry(String country) {
-        return ResponseEntity.ok(service.getTourByCountry(country));
+    public ResponseEntity<List<TourDto>> getToursByEndDate(
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return ResponseEntity.ok(tourService.getToursByEndDate(endDate));
     }
 
     @Override
-    public ResponseEntity<TourDto> getTourByCity(String city) {
-        return ResponseEntity.ok(service.getTourByCity(city));
+    public ResponseEntity<List<TourDto>> getToursByCountry(@PathVariable String country) {
+        return ResponseEntity.ok(tourService.getToursByCountry(country));
+    }
+
+    @Override
+    public ResponseEntity<List<TourDto>> getToursByCity(@PathVariable String city) {
+        return ResponseEntity.ok(tourService.getToursByCity(city));
     }
 }

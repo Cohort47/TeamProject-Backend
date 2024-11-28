@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.backend.dto.responseDto.ErrorResponseDto;
 import org.backend.dto.tourDto.TourDto;
 import org.backend.entity.Tour;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,11 +22,13 @@ import java.util.List;
 @RequestMapping("/api/tours")
 public interface TourApi {
 
+    @GetMapping
     ResponseEntity<List<TourDto>> findAll();
 
+    @GetMapping("/full")
     ResponseEntity<List<Tour>> findAllFull();
 
-    @Operation(summary = "Getting information about the Tour ID")
+    @Operation(summary = "Getting information about the Tour by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Tour information",
                     content = @Content(mediaType = "application/json",
@@ -33,35 +36,31 @@ public interface TourApi {
             @ApiResponse(responseCode = "404", description = "Tour not found",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponseDto.class)))
-    }
-    )
-    // /api/tours?title=example&tourState=example2
+    })
     @GetMapping("/{tourId}")
-    public ResponseEntity<TourDto> getTourById(@PathVariable long tourId);
+    ResponseEntity<TourDto> getTourById(@PathVariable long tourId);
 
-    @GetMapping("/{title}")
-    public ResponseEntity<TourDto> getTourByTitle(@RequestParam String title);
+    @GetMapping("/title/{title}")
+    ResponseEntity<List<TourDto>> getToursByTitle(@PathVariable String title);
 
-    @GetMapping("/{tourState}")
-    public ResponseEntity<TourDto> getTourByState(@PathVariable String tourState);
+    @GetMapping("/state/{tourState}")
+    ResponseEntity<List<TourDto>> getToursByState(@PathVariable String tourState);
 
-    @GetMapping("/{price}")
-    public ResponseEntity<TourDto> getTourByPrice(@PathVariable long price);
+    @GetMapping("/price/{price}")
+    ResponseEntity<List<TourDto>> getToursByPrice(@PathVariable long price);
 
-    @GetMapping("/{duration}")
-    public ResponseEntity<TourDto> getTourByDuration(@PathVariable long duration);
+    @GetMapping("/duration/{duration}")
+    ResponseEntity<List<TourDto>> getToursByDuration(@PathVariable long duration);
 
-    @GetMapping("/{startDate}")
-    public ResponseEntity<TourDto> getTourByStartDate(@PathVariable LocalDate startDate );
+    @GetMapping("/start-date/{startDate}")
+    ResponseEntity<List<TourDto>> getToursByStartDate(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate);
 
-    @GetMapping("/{endDate}")
-    public ResponseEntity<TourDto> getTourByEndDate(@PathVariable LocalDate endDate);
+    @GetMapping("/end-date/{endDate}")
+    ResponseEntity<List<TourDto>> getToursByEndDate(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate);
 
-    @GetMapping("/{country}")
-    ResponseEntity<TourDto> getTourByCountry(@PathVariable String country);
+    @GetMapping("/country/{country}")
+    ResponseEntity<List<TourDto>> getToursByCountry(@PathVariable String country);
 
-    @GetMapping("/{city}")
-    ResponseEntity<TourDto> getTourByCity(@PathVariable String city);
-
-
+    @GetMapping("/city/{city}")
+    ResponseEntity<List<TourDto>> getToursByCity(@PathVariable String city);
 }
