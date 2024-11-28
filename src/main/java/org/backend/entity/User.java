@@ -6,12 +6,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Collection;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "user")
+@Table(name = "user", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
 public class User {
 
     public enum Role {
@@ -44,6 +46,12 @@ public class User {
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private Role role;
+
+//    @ManyToMany(fetch = FetchType.EAGER)
+//    @JoinTable(name = "users_role",
+//    joinColumns = @JoinColumn(name = "user_id", referencedColumnName ="id"),
+//    inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+//    private Collection<Role> roles;
 
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)

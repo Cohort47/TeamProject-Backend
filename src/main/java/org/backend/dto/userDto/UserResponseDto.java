@@ -3,7 +3,8 @@ package org.backend.dto.userDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.backend.entity.User;
+
+import java.util.Collection;
 
 @Data
 @AllArgsConstructor
@@ -14,5 +15,5 @@ public class UserResponseDto {
     private String userFirstName;
     private String userLastName;
     private String email;
-    private User.Role role;
+    private String roles;
 }

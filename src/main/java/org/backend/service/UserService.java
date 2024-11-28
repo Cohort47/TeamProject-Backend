@@ -12,21 +12,22 @@ import org.backend.repository.UserRepository;
 import org.backend.service.exception.AlreadyExistException;
 import org.backend.service.exception.NotFoundException;
 import org.backend.service.mail.MailUtil;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserService {
+public class UserService{
 
     private final UserRepository userRepository;
     private final ConfirmationCodeRepository confirmationCodeRepository;
     private final MailUtil mailUtil;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Transactional
@@ -37,13 +38,15 @@ public class UserService {
                             + newUser.getEmail() + " already registered");
         }
 
+
         User user = User.builder()
+
                 .email(newUser.getEmail())
                 .firstName(newUser.getFirstName())
                 .lastName(newUser.getLastName())
-                .hashPassword(newUser.getHashPassword())
+                .hashPassword(passwordEncoder.encode(newUser.getHashPassword()))
+                .state(User.State.CONFIRMED)
                 .role(User.Role.USER)
-                .state(User.State.NOT_CONFIRMED)
                 .build();
 
         userRepository.save(user);
@@ -140,6 +143,14 @@ public class UserService {
 
     public void deleteUserById(Long userId) {
         // Удаление пользователя по id
-         userRepository.deleteById(userId); }
+         userRepository.deleteById(userId);
     }
+
+
+}
+
+
+
+
+
 
