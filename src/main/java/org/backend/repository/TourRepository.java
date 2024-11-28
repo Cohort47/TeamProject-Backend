@@ -5,50 +5,46 @@ import org.backend.entity.Tour;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 
 
 
-public interface TourRepository extends JpaRepository<Tour,Long> {
+public interface TourRepository extends JpaRepository<Tour, Long> {
 
+    // Find a tour by its ID
     Optional<Tour> findById(Long id);
 
+    // Check existence by ID
     boolean existsById(Long id);
 
+    // Find tours by title
+    List<Tour> findByTitle(String title);
 
 
-
-    Optional<Tour> findByTitle(String title);
-
-    boolean existsByTitle(String title);
+    // Find tours by state
+    List<Tour> findByState(Tour.State state);
 
 
+    // Find tours by price
+    List<Tour> findByPrice(long price);
 
 
-    Optional<Tour> findTourByState(String tourState);
-
-    boolean existsByState(Tour.State state);
-
+    // Find tours by duration
+    List<Tour> findByDuration(long duration);
 
 
-    Optional<Tour>  findByPrice(long tourPrice);
-    boolean existsByPrice(long tourPrice);
+    // Find tours by start date
+    List<Tour> findByStartDate(LocalDate startDate);
 
+    // Find tours by end date
+    List<Tour> findByEndDate(LocalDate endDate);
 
+    // Find tours by country
+    List<Tour> findByCountry(String country);
 
-    Optional<Tour> findByDuration(long tourDuration);
-    boolean existsByDuration(long tourDuration);
+    // Find tours by city
+    List<Tour> findByCity(String city);
 
-
-
-    Optional<Tour> findByStartDate(LocalDate tourStartDate);
-
-    Optional<Tour> findByEndDate(LocalDate tourEndDate);
-
-    Optional<Tour>  findTourByCountry(String tourCountry);
-    boolean existsTourByCountry(String tourCountry);
-
-    Optional<Tour>  findTourByCity(String tourCity);
-    boolean existsTourByCity(String tourCity);
 }

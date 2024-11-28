@@ -12,104 +12,97 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
-@Service
 @RequiredArgsConstructor
+@Service
 @Slf4j
 public class TourService {
     private final TourRepository tourRepository;
 
-    public List<TourDto> findAll(){
+
+    public List<TourDto> findAll() {
         return TourDto.from(tourRepository.findAll());
     }
 
-    public TourDto getTourById(Long tourId){
-        Tour tour = tourRepository.findById(tourId)
-                .orElseThrow(() -> new NotFoundException("Tour with ID "
-                        + tourId + " not found"));
-        return TourDto.from(tour);
-    }
-
-
-    @Transactional
-    public TourDto makeTourClosed(String title){
-        Tour tour = tourRepository.findByTitle(title)
-                .orElseThrow(() -> new NotFoundException("Tour with title "
-                        + title + " not found"));
-
-        tour.setState(Tour.State.CLOSED);
-        tourRepository.save(tour);
-
-        return TourDto.from(tour);
-    }
-
-
-    public List<Tour> findAllFull(){
+    public List<Tour> findAllFull() {
         return tourRepository.findAll();
     }
 
-    public TourDto getTourByTitle(String title) {
-        Tour tour = tourRepository.findByTitle(title)
-                .orElseThrow(() -> new NotFoundException("Tour with title "
-                        + title + " not found"));
+    public TourDto getTourById(Long tourId) {
+        Tour tour = tourRepository.findById(tourId)
+                .orElseThrow(() -> new NotFoundException("Tour with ID " + tourId + " not found"));
         return TourDto.from(tour);
     }
 
-    public TourDto getTourByState(String tourState) {
-        Tour tour = tourRepository.findTourByState(tourState)
-                .orElseThrow(() -> new NotFoundException("Tour with state "
-                        + tourState + " not found"));
-        return TourDto.from(tour);
+    public List<TourDto> getToursByTitle(String title) {
+        List<Tour> tours = tourRepository.findByTitle(title);
+        if (tours.isEmpty()) {
+            throw new NotFoundException("No tours found with title " + title);
+        }
+        return TourDto.from(tours);
     }
 
-    public TourDto getTourByPrice(long price) {
-        Tour tour = tourRepository.findByPrice(price)
-                .orElseThrow(() -> new NotFoundException("Tour with Price "
-                        + price + " not found"));
-        return TourDto.from(tour);
+    public List<TourDto> getToursByState(String tourState) {
+        List<Tour> tours = tourRepository.findByState(Tour.State.valueOf(tourState));
+        if (tours.isEmpty()) {
+            throw new NotFoundException("No tours found with state " + tourState);
+        }
+        return TourDto.from(tours);
     }
 
-    public TourDto getTourByDuration(long duration) {
-        Tour tour = tourRepository.findByDuration(duration)
-                .orElseThrow(() -> new NotFoundException("Tour with Duration "
-                        + duration + " not found"));
-        return TourDto.from(tour);
+    public List<TourDto> getToursByPrice(long price) {
+        List<Tour> tours = tourRepository.findByPrice(price);
+        if (tours.isEmpty()) {
+            throw new NotFoundException("No tours found with price " + price);
+        }
+        return TourDto.from(tours);
     }
 
-    public TourDto getTourByStartDate(LocalDate startDate) {
-        Tour tour = tourRepository.findByStartDate(startDate)
-                .orElseThrow(() -> new NotFoundException("Tour with StartDate "
-                        + startDate + " not found"));
-        return TourDto.from(tour);
+    public List<TourDto> getToursByDuration(long duration) {
+        List<Tour> tours = tourRepository.findByDuration(duration);
+        if (tours.isEmpty()) {
+            throw new NotFoundException("No tours found with duration " + duration);
+        }
+        return TourDto.from(tours);
     }
 
-    public TourDto getTourByEndDate(LocalDate endDate) {
-        Tour tour = tourRepository.findByEndDate(endDate)
-                .orElseThrow(() -> new NotFoundException("Tour with EndDate "
-                        + endDate + " not found"));
-        return TourDto.from(tour);
+    public List<TourDto> getToursByStartDate(LocalDate startDate) {
+        List<Tour> tours = tourRepository.findByStartDate(startDate);
+        if (tours.isEmpty()) {
+            throw new NotFoundException("No tours found with start date " + startDate);
+        }
+        return TourDto.from(tours);
     }
 
+    public List<TourDto> getToursByEndDate(LocalDate endDate) {
+        List<Tour> tours = tourRepository.findByEndDate(endDate);
+        if (tours.isEmpty()) {
+            throw new NotFoundException("No tours found with end date " + endDate);
+        }
+        return TourDto.from(tours);
+    }
+
+    public List<TourDto> getToursByCountry(String country) {
+        List<Tour> tours = tourRepository.findByCountry(country);
+        if (tours.isEmpty()) {
+            throw new NotFoundException("No tours found in country " + country);
+        }
+        return TourDto.from(tours);
+    }
+
+    public List<TourDto> getToursByCity(String city) {
+        List<Tour> tours = tourRepository.findByCity(city);
+        if (tours.isEmpty()) {
+            throw new NotFoundException("No tours found in city " + city);
+        }
+        return TourDto.from(tours);
+    }
+
+    @Transactional
     public Tour updateTourState(Long tourId, Tour.State newState) {
-        Tour tour = tourRepository
-                .findById(tourId)
-                .orElseThrow(() -> new NotFoundException("Tour with ID "
-                        + tourId + " not found"));
+        Tour tour = tourRepository.findById(tourId)
+                .orElseThrow(() -> new NotFoundException("Tour with ID " + tourId + " not found"));
         tour.setState(newState);
         return tourRepository.save(tour);
-    }
-
-    public TourDto getTourByCountry(String country) {
-        Tour tour = tourRepository.findTourByCountry(country)
-                .orElseThrow(() -> new NotFoundException("Tour with country "
-                        + country + " not found"));
-        return TourDto.from(tour);
-    }
-
-    public TourDto getTourByCity(String city) {
-        Tour tour = tourRepository.findTourByCity(city)
-                .orElseThrow(() -> new NotFoundException("Tour with city "
-                        + city + " not found"));
-        return TourDto.from(tour);
     }
 }
 
