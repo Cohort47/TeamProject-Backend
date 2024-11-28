@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.backend.entity.Booking;
 
+import java.time.LocalDate;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,5 +17,8 @@ public class BookingResponseDto {
     private Long userId;
     private Long tourId;
     private Booking.State state;
+    private Long duration;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
 }

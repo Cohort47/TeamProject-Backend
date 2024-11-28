@@ -3,6 +3,7 @@ package org.backend.controller;
 
 
 
+
 import lombok.RequiredArgsConstructor;
 import org.backend.controller.api.AdminApi;
 import org.backend.dto.userDto.UserDto;
@@ -31,7 +32,7 @@ public class AdminController implements AdminApi {
         List<UserDto> remainingUsers = service.findAll();
         // Обновленный список пользователей
          return ResponseEntity.ok(remainingUsers);
-    }
+             }
 
     @Override
     public ResponseEntity<UserDto> makeUserBan(String email) {

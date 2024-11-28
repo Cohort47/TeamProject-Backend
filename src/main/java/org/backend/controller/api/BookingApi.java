@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -39,4 +40,12 @@ public interface BookingApi {
     public ResponseEntity<BookingDto> getBookingById(@PathVariable long bookingId);
 
 
+    @GetMapping("/{duration}")
+    ResponseEntity<BookingDto> getBookingByDuration(@PathVariable Long duration);
+
+    @GetMapping("/{startDate}")
+    public ResponseEntity<BookingDto> getBookingByStartDate(@PathVariable LocalDate startDate );
+
+    @GetMapping("/{endDate}")
+    public ResponseEntity<BookingDto> getBookingByEndDate(@PathVariable LocalDate endDate);
 }

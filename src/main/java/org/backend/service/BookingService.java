@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -34,12 +35,12 @@ public class BookingService {
 
     @Transactional
     public Booking updateBookingState (Long bookingId, Booking.State newState){
-         Booking booking = bookingRepository
-                 .findById(bookingId)
-                 .orElseThrow(() -> new NotFoundException("Booking with ID "
-                         + bookingId + " not found"));
-         booking.setState(newState);
-         return bookingRepository.save(booking);
+        Booking booking = bookingRepository
+                .findById(bookingId)
+                .orElseThrow(() -> new NotFoundException("Booking with ID "
+                        + bookingId + " not found"));
+        booking.setState(newState);
+        return bookingRepository.save(booking);
     }
 
     @Transactional
@@ -63,7 +64,7 @@ public class BookingService {
         return BookingDto.from(bookingRepository.findAll());
     }
 
-    public BookingDto getBookingByState(String bookingState) {
+    public BookingDto getBookingByState(Booking.State bookingState) {
         Booking booking = bookingRepository.findBookingByState(bookingState)
                 .orElseThrow(() -> new NotFoundException("Booking with state "
                         + bookingState + " not found"));
@@ -74,6 +75,27 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Booking with ID "
                         + bookingId + " not found"));
+        return BookingDto.from(booking);
+    }
+
+    public BookingDto getBookingByDuration(long duration) {
+        Booking booking = bookingRepository.findByDuration(duration)
+                .orElseThrow(() -> new NotFoundException("Booking with Duration "
+                        + duration + " not found"));
+        return BookingDto.from(booking);
+    }
+
+    public BookingDto getBookingByStartDate(LocalDate startDate) {
+        Booking booking = bookingRepository.findByStartDate(startDate)
+                .orElseThrow(() -> new NotFoundException("booking with StartDate "
+                        + startDate + " not found"));
+        return BookingDto.from(booking);
+    }
+
+    public BookingDto getBookingByEndDate(LocalDate endDate) {
+        Booking booking = bookingRepository.findByEndDate(endDate)
+                .orElseThrow(() -> new NotFoundException("booking with EndDate "
+                        + endDate + " not found"));
         return BookingDto.from(booking);
     }
 }
