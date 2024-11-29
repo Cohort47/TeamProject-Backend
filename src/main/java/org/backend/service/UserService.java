@@ -3,6 +3,7 @@ package org.backend.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.backend.dto.responseDto.StandardResponseDto;
 import org.backend.dto.userDto.NewUserDto;
 import org.backend.dto.userDto.UserDto;
 import org.backend.entity.ConfirmationCode;
@@ -12,6 +13,8 @@ import org.backend.repository.UserRepository;
 import org.backend.service.exception.AlreadyExistException;
 import org.backend.service.exception.NotFoundException;
 import org.backend.service.mail.MailUtil;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +38,8 @@ public class UserService{
 
         if (userRepository.existsByEmail(newUser.getEmail())) {
             throw new AlreadyExistException("User with email: "
-                            + newUser.getEmail() + " already registered");
+                    + newUser.getEmail()
+                    + " already registered");
         }
 
 
@@ -146,7 +150,28 @@ public class UserService{
          userRepository.deleteById(userId);
     }
 
+    public User getCurrentUser(){
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
+        String email;
+
+        if (principal instanceof UserDetails){
+            email = ((UserDetails) principal).getUsername();
+        } else {
+            email = principal.toString();
+        }
+
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User with email: " + email + " not found"));
+    }
+
+    public StandardResponseDto setPhotoLink(String fileLink){
+        User user = getCurrentUser(); // определяем текущего пользователя
+
+        user.setPhotoLink(fileLink);
+        userRepository.save(user);
+        return new StandardResponseDto("Photo successfully updated");
+    }
 }
 
 
