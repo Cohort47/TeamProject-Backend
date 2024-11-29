@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -56,5 +57,24 @@ public class BookingController implements BookingApi {
     @GetMapping("/{bookingId}/dto")
     public ResponseEntity<BookingDto> getBookingById(long bookingId) {
         return ResponseEntity.ok(bookingService.getBookingById(bookingId));
+    }
+
+    @Override
+    @GetMapping("/{duration}")
+    public ResponseEntity<BookingDto> getBookingByDuration(@PathVariable Long duration) {
+        return ResponseEntity.ok(bookingService.getBookingByDuration(duration));
+    }
+
+
+    @Override
+    @GetMapping("/{startDate}")
+    public ResponseEntity<BookingDto> getBookingByStartDate(@PathVariable LocalDate startDate) {
+        return ResponseEntity.ok(bookingService.getBookingByStartDate(startDate));
+    }
+
+    @Override
+    @GetMapping("/{endDate}")
+    public ResponseEntity<BookingDto> getBookingByEndDate(@PathVariable LocalDate endDate) {
+        return ResponseEntity.ok(bookingService.getBookingByEndDate(endDate));
     }
 }

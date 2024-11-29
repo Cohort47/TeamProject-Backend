@@ -3,6 +3,7 @@ package org.backend.repository;
 import org.backend.entity.Booking;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
@@ -12,5 +13,16 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
 
 
-    Optional<Booking> findBookingByState(String bookingState);
+    Optional<Booking> findBookingByState(Booking.State state);
+
+
+
+    Optional<Booking> findByDuration(long bookingDuration);
+    boolean existsByDuration(long bookingDuration);
+
+
+
+    Optional<Booking> findByStartDate(LocalDate bookingStartDate);
+
+    Optional<Booking> findByEndDate(LocalDate bookingEndDate);
 }
