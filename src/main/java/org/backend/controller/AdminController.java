@@ -6,9 +6,12 @@ package org.backend.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.backend.controller.api.AdminApi;
+import org.backend.dto.tourDto.TourDto;
+import org.backend.dto.tourDto.TourUpdateRequest;
 import org.backend.dto.userDto.UserDto;
 import org.backend.entity.ConfirmationCode;
 import org.backend.entity.User;
+import org.backend.service.TourService;
 import org.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +24,7 @@ import java.util.List;
 public class AdminController implements AdminApi {
 
     private final UserService service;
+    private final TourService tourService;
 
     @Override
     public ResponseEntity<List<UserDto>> findAll() {
@@ -47,6 +51,12 @@ public class AdminController implements AdminApi {
     @Override
     public ResponseEntity<List<ConfirmationCode>> findAllCodes(String email) {
         return ResponseEntity.ok(service.findCodesByUser(email));
+    }
+
+    @Override
+    public ResponseEntity<TourDto> updateTour(Long id, TourUpdateRequest updateRequest) {
+        TourDto updatedTour = tourService.updateTour(id, updateRequest);
+        return ResponseEntity.ok(updatedTour);
     }
 
 

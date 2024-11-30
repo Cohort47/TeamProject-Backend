@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Builder
@@ -39,7 +40,7 @@ public class NewTourDto {
     @NotBlank (message = "Tour city should not be empty")
     private String city;
 
-    private String imageUrl;
+    private List<String> photoLinks;
 }
 
 

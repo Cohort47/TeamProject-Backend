@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.backend.entity.Tour;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -41,7 +42,7 @@ public class TourRequestDto {
     @NotBlank(message = "city is required")
     private String city;
 
-    private String imageUrl;
+    private List<String> photoLinks;
 }
 
 

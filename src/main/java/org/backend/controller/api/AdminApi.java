@@ -2,6 +2,8 @@ package org.backend.controller.api;
 
 
 
+import org.backend.dto.tourDto.TourDto;
+import org.backend.dto.tourDto.TourUpdateRequest;
 import org.backend.dto.userDto.UserDto;
 import org.backend.entity.ConfirmationCode;
 import org.backend.entity.User;
@@ -28,6 +30,11 @@ public interface AdminApi {
 
     @GetMapping("/users/all-codes")
     ResponseEntity<List<ConfirmationCode>> findAllCodes(@RequestParam String email);
+
+
+    //Обновление тура
+    @PutMapping("/tours/{id}")
+    ResponseEntity<TourDto> updateTour(@PathVariable Long id, @RequestBody TourUpdateRequest updateRequest);
 
 
 }

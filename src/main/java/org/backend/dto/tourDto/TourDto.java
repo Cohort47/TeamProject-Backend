@@ -28,6 +28,7 @@ public class TourDto {
     private Tour.State state;
     private String country;
     private String city;
+    private List<String> photoLinks;
 
     public static TourDto from(Tour tour){
         return TourDto.builder()
@@ -37,10 +38,11 @@ public class TourDto {
                 .price(tour.getPrice())
                 .duration(tour.getDuration())
                 .startDate(tour.getStartDate())
-                .startDate(tour.getEndDate())
+                .endDate(tour.getEndDate())
                 .state(tour.getState())
                 .country(tour.getCountry())
                 .city(tour.getCity())
+                .photoLinks(tour.getPhotoLinks())
 
                 .build();
     }
