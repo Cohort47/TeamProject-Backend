@@ -14,33 +14,38 @@ import java.time.LocalDate;
 @Entity
 public class Booking {
 
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
-    private Long userId;
-
-    @Column(nullable = false)
-    private Long tourId;
-
-    @Enumerated(EnumType.STRING)
-    private State state;
-
-
     public enum State {
         AVAILABLE,
         BOOKED,
         PAID,
         CANCELLED
     }
-    @Column(length = 10)
-    private Long duration;
 
-    @Column(nullable = false)
-    private LocalDate startDate;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "tour_id", nullable = false)
+    private Tour tour;
+
+
+    // Дата создания бронирования
     @Column(nullable = false)
-    private LocalDate endDate;
+    private LocalDate bookingDate;
+
+
+    // Дата начала тура, выбранная пользователем
+    @Column(nullable = false)
+    private LocalDate tourDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private State state;
+
 }

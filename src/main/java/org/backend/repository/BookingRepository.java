@@ -4,25 +4,21 @@ import org.backend.entity.Booking;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     Optional<Booking> findById(Long id);
-    boolean existsById(Long id);
 
+    List<Booking> findBookingByState(Booking.State state);
 
+    List<Booking> findByTourDate(LocalDate tourDate);
 
-    Optional<Booking> findBookingByState(Booking.State state);
+    List<Booking> findByBookingDate(LocalDate fromDate);
 
+    List<Booking> findByUserId(Long userId);
 
+    List<Booking> findByTourId(Long tourId);
 
-    Optional<Booking> findByDuration(long bookingDuration);
-    boolean existsByDuration(long bookingDuration);
-
-
-
-    Optional<Booking> findByStartDate(LocalDate bookingStartDate);
-
-    Optional<Booking> findByEndDate(LocalDate bookingEndDate);
 }

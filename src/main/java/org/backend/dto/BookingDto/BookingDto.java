@@ -19,21 +19,18 @@ public class BookingDto {
     private Long id;
     private Long userId;
     private Long tourId;
-    private String state;
-    private Long duration;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private LocalDate bookingDate; // Дата создания бронирования
+    private LocalDate tourDate; // Дата начала тура
+    private Booking.State state;
 
     public static BookingDto from(Booking booking) {
         return BookingDto.builder()
                 .id(booking.getId())
-                .userId(booking.getUserId())
-                .tourId(booking.getTourId())
-                .duration(booking.getDuration())
-                .startDate(booking.getStartDate())
-                .endDate(booking.getEndDate())
-                .state(booking.getState()
-                .toString())
+                .userId(booking.getUser().getId())
+                .tourId(booking.getTour().getId())
+                .bookingDate(booking.getBookingDate())
+                .tourDate(booking.getTourDate())
+                .state(booking.getState())
                 .build();
 
     }

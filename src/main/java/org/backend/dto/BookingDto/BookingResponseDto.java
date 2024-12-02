@@ -16,9 +16,8 @@ public class BookingResponseDto {
     private Long id;
     private Long userId;
     private Long tourId;
+    private LocalDate bookingDate; // Дата создания бронирования
+    private LocalDate tourDate; // Дата начала тура
     private Booking.State state;
-    private Long duration;
-    private LocalDate startDate;
-    private LocalDate endDate;
 
 }

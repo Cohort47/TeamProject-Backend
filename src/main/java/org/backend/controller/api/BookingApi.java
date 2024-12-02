@@ -10,9 +10,7 @@ import org.backend.dto.BookingDto.BookingDto;
 import org.backend.dto.responseDto.ErrorResponseDto;
 import org.backend.entity.Booking;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,10 +18,6 @@ import java.util.List;
 
 @RequestMapping("/api/bookings")
 public interface BookingApi {
-
-    ResponseEntity<List<BookingDto>> findAll();
-
-    ResponseEntity<List<Booking>> findAllFull();
 
     @Operation(summary = "Getting information about the Booking ID")
     @ApiResponses(value = {
@@ -36,16 +30,29 @@ public interface BookingApi {
     }
     )
 
+    @PostMapping
+    ResponseEntity<Booking> createBooking(@RequestParam Long userId, @RequestParam Long tourId, @RequestParam LocalDate tourDate);
+
+    @PutMapping("/{bookingId}")
+    ResponseEntity<Booking> updateBookingState(@PathVariable Long bookingId, @RequestParam Booking.State newState);
+
+    @DeleteMapping("/{bookingId}")
+    ResponseEntity<Void> deleteBooking(@PathVariable Long bookingId);
+
     @GetMapping("/{bookingId}")
-    public ResponseEntity<BookingDto> getBookingById(@PathVariable long bookingId);
+    ResponseEntity<BookingDto> getBookingById(@PathVariable Long bookingId);
+
+    @GetMapping
+    ResponseEntity<List<BookingDto>> findAll();
+
+    @GetMapping("/state/{state}")
+    ResponseEntity<List<BookingDto>> findBookingByState(@PathVariable Booking.State state);
+
+    @GetMapping("/bookingDate/{bookingDate}")
+    ResponseEntity<List<BookingDto>> getBookingsByBookingDate(@PathVariable LocalDate bookingDate);
+
+    @GetMapping("/tourDate/{tourDate}")
+    ResponseEntity<List<BookingDto>> getBookingsByTourDate(@PathVariable LocalDate tourDate);
 
 
-    @GetMapping("/{duration}")
-    ResponseEntity<BookingDto> getBookingByDuration(@PathVariable Long duration);
-
-    @GetMapping("/{startDate}")
-    public ResponseEntity<BookingDto> getBookingByStartDate(@PathVariable LocalDate startDate );
-
-    @GetMapping("/{endDate}")
-    public ResponseEntity<BookingDto> getBookingByEndDate(@PathVariable LocalDate endDate);
 }

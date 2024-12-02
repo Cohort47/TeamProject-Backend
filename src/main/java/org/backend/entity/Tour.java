@@ -65,4 +65,7 @@ public class Tour {
     @Column(nullable = false)
     private String city;
 
+    @OneToMany(mappedBy = "tour", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Booking> bookings = new ArrayList<>();
+
 }

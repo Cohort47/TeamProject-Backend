@@ -1,6 +1,7 @@
 package org.backend.controller;
 
 
+import lombok.RequiredArgsConstructor;
 import org.backend.controller.api.BookingApi;
 import org.backend.dto.BookingDto.BookingDto;
 import org.backend.entity.Booking;
@@ -12,34 +13,33 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
+
 @RestController
-@RequestMapping("/api/bookings")
+@RequiredArgsConstructor
 public class BookingController implements BookingApi {
 
     private final BookingService bookingService;
 
-    @Autowired
-    public BookingController(BookingService bookingService) {
-        this.bookingService = bookingService; }
 
-    @PostMapping
-    public ResponseEntity<Booking> createBooking(@RequestParam Long userId, @RequestParam Long tourId) {
-        Booking booking = bookingService.createBooking(userId, tourId);
-        return ResponseEntity.ok(booking); }
+    @Override
+    public ResponseEntity<Booking> createBooking(@RequestParam Long userId, @RequestParam Long tourId, @RequestParam LocalDate tourDate) {
+        Booking booking = bookingService.createBooking(userId, tourId, tourDate);
+        return ResponseEntity.ok(booking);
+    }
 
-    @PutMapping("/{bookingId}")
+    @Override
     public ResponseEntity<Booking> updateBookingState(@PathVariable Long bookingId, @RequestParam Booking.State newState) {
         Booking updatedBooking = bookingService.updateBookingState(bookingId, newState);
         return ResponseEntity.ok(updatedBooking); }
 
-    @DeleteMapping("/{bookingId}")
+    @Override
     public ResponseEntity<Void> deleteBooking(@PathVariable Long bookingId) {
         bookingService.deleteBooking(bookingId);
         return ResponseEntity.noContent().build(); }
 
-    @GetMapping("/{bookingId}")
-    public ResponseEntity<BookingDto> getBooking(@PathVariable Long bookingId) {
-        BookingDto booking = bookingService.getBooking(bookingId);
+    @Override
+    public ResponseEntity<BookingDto> getBookingById(@PathVariable Long bookingId) {
+        BookingDto booking = bookingService.getBookingById(bookingId);
         return ResponseEntity.ok(booking); }
 
 
@@ -49,32 +49,23 @@ public class BookingController implements BookingApi {
     }
 
     @Override
-    public ResponseEntity<List<Booking>> findAllFull() {
-        return ResponseEntity.ok(bookingService.findAllFull());
+    public ResponseEntity<List<BookingDto>> findBookingByState(@PathVariable Booking.State state) {
+        List<BookingDto> bookings = bookingService.findBookingByState(state);
+        return ResponseEntity.ok(bookings);
     }
 
     @Override
-    @GetMapping("/{bookingId}/dto")
-    public ResponseEntity<BookingDto> getBookingById(long bookingId) {
-        return ResponseEntity.ok(bookingService.getBookingById(bookingId));
+    public ResponseEntity<List<BookingDto>> getBookingsByBookingDate(LocalDate bookingDate) {
+        List<BookingDto> bookings = bookingService.getBookingsByBookingDate(bookingDate);
+        return ResponseEntity.ok(bookings);
     }
 
     @Override
-    @GetMapping("/{duration}")
-    public ResponseEntity<BookingDto> getBookingByDuration(@PathVariable Long duration) {
-        return ResponseEntity.ok(bookingService.getBookingByDuration(duration));
+    public ResponseEntity<List<BookingDto>> getBookingsByTourDate(LocalDate tourDate) {
+        List<BookingDto> bookings = bookingService.getBookingsByTourDate(tourDate);
+        return ResponseEntity.ok(bookings);
     }
 
 
-    @Override
-    @GetMapping("/{startDate}")
-    public ResponseEntity<BookingDto> getBookingByStartDate(@PathVariable LocalDate startDate) {
-        return ResponseEntity.ok(bookingService.getBookingByStartDate(startDate));
-    }
 
-    @Override
-    @GetMapping("/{endDate}")
-    public ResponseEntity<BookingDto> getBookingByEndDate(@PathVariable LocalDate endDate) {
-        return ResponseEntity.ok(bookingService.getBookingByEndDate(endDate));
-    }
 }

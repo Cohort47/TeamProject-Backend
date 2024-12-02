@@ -23,12 +23,10 @@ public class BookingCreateRequestDto {
     @NotBlank(message = "Tour State not be empty")
     private Booking.State state;
 
-    @NotBlank(message = "Booking duration not be empty")
-    private Long duration;
+    @NotBlank(message = "Booking bookingDate not be empty")
+    private LocalDate bookingDate; // Дата создания бронирования
 
-    @NotBlank(message = "Booking startDate not be empty")
-    private LocalDate startDate;
+    @NotBlank(message = "Booking tourDate not be empty")
+    private LocalDate tourDate; // Дата начала тура
 
-    @NotBlank(message = "Booking endDate not be empty")
-    private LocalDate endDate;
 }
