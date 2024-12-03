@@ -48,7 +48,8 @@ public class BookingController implements BookingApi {
 
     @Override
     public ResponseEntity<List<BookingResponseDto>> findAll() {
-        return ResponseEntity.ok(bookingService.findAll());
+        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return ResponseEntity.ok(bookingService.findAll(userEmail));
     }
 
     @Override

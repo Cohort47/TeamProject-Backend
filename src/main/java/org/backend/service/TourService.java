@@ -64,8 +64,8 @@ public class TourService {
 
         // Объединяем ссылки на фото
         List<String> updatedPhotoLinks = new ArrayList<>(existingTour.getPhotoLinks());
-        if (updateRequest.getPhotoLinks() != null) {
-            updatedPhotoLinks.addAll(updateRequest.getPhotoLinks());
+        if (updateRequest.getPhotoLinks() != null && !updateRequest.getPhotoLinks().isEmpty()) {
+            updatedPhotoLinks = new ArrayList<>(updateRequest.getPhotoLinks());
         }
 
         // Перезаписываем поля
@@ -86,6 +86,18 @@ public class TourService {
         Tour updatedTour = tourRepository.save(existingTour);
 
         return TourResponseDto.from(updatedTour);
+    }
+
+    // Метод для удаления тура по ID
+    public void deleteTour(Long tourId) {
+        // Проверяем, существует ли тур с таким ID
+        if (tourRepository.existsById(tourId)) {
+            // Если существует, удаляем его
+            tourRepository.deleteById(tourId);
+        } else {
+            // Если тура с таким ID не существует, выбрасываем исключение
+            throw new IllegalArgumentException("Tour with id " + tourId + " not found");
+        }
     }
 }
 

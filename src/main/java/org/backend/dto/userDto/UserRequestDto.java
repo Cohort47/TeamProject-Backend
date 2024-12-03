@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -24,5 +26,7 @@ public class UserRequestDto {
 
     @NotBlank (message = "User password should not be empty")
     private String hashPassword;
+
+    private String photoLinks;
 
 }

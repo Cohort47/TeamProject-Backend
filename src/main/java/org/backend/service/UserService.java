@@ -2,7 +2,9 @@ package org.backend.service;
 
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.backend.dto.userDto.UserRequestDto;
 import org.backend.dto.userDto.UserResponseDto;
 import org.backend.entity.ConfirmationCode;
@@ -139,6 +141,50 @@ public class UserService{
     public List<UserResponseDto> findAllFull() {
         return UserResponseDto.from(userRepository.findAll());
     }
+
+    public UserResponseDto updateUser(String userEmail, UserRequestDto updateRequest) {
+        // Проверяем, существует ли пользователь с данным id
+        User existingUser = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new NotFoundException("User with ID " + userEmail + " not found"));
+
+        // Обновляем поля пользователя
+        existingUser.setFirstName(updateRequest.getFirstName() != null ? updateRequest.getFirstName() : existingUser.getFirstName());
+        existingUser.setLastName(updateRequest.getLastName() != null ? updateRequest.getLastName() : existingUser.getLastName());
+        existingUser.setEmail(updateRequest.getEmail() != null ? updateRequest.getEmail() : existingUser.getEmail());
+        existingUser.setHashPassword(updateRequest.getHashPassword() != null ? updateRequest.getHashPassword() : existingUser.getHashPassword());
+
+        // Сохраняем обновленные данные пользователя в базу данных
+        User updatedUser = userRepository.save(existingUser);
+
+        // Возвращаем обновленные данные пользователя в виде DTO
+        return UserResponseDto.from(updatedUser);
+    }
+
+    @SneakyThrows
+    public UserResponseDto updateUserRole(Long id, String role) {
+        // Найти пользователя по ID
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User with ID " + id + " not found"));
+
+        // Проверить, является ли переданная роль допустимой
+        User.Role newRole;
+        try {
+            newRole = User.Role.valueOf(role.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid role: " + role);
+        }
+
+        // Установить новую роль пользователю
+        existingUser.setRole(newRole);
+
+        // Сохранить изменения в базе данных
+        User updatedUser = userRepository.save(existingUser);
+
+        // Вернуть обновленные данные пользователя в виде DTO
+        return UserResponseDto.from(updatedUser);
+    }
+
+
 
     public List<ConfirmationCode> findCodesByUser(String email) {
         User user = userRepository.findByEmail(email)

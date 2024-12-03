@@ -20,12 +20,12 @@ public interface AdminApi {
     @DeleteMapping("/users/{userId}")
     ResponseEntity<List<UserResponseDto>> deleteUser(@PathVariable Long userId);
 
+    @PutMapping("/give-role/{id}")
+    ResponseEntity<UserResponseDto> updateUserRole( @PathVariable("id") Long id, @RequestParam String role );
+
     @GetMapping("/ban")
     ResponseEntity<UserResponseDto> makeUserBan(@RequestParam String email);
 
-
-    @GetMapping("/users/full-details")
-    ResponseEntity<List<UserResponseDto>> findAllFull();
 
     @GetMapping("/users/all-codes")
     ResponseEntity<List<ConfirmationCode>> findAllCodes(@RequestParam String email);
@@ -35,5 +35,7 @@ public interface AdminApi {
     @PutMapping("/tours/{id}")
     ResponseEntity<TourResponseDto> updateTour(@PathVariable Long id, @RequestBody TourRequestDto updateRequest);
 
+    @DeleteMapping("/tours/{tourId}")
+    ResponseEntity<List<TourResponseDto>> deleteTour(@PathVariable Long tourId);
 
 }

@@ -8,11 +8,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.backend.dto.responseDto.ErrorResponseDto;
+import org.backend.dto.tourDto.TourRequestDto;
+import org.backend.dto.userDto.UserRequestDto;
 import org.backend.dto.userDto.UserResponseDto;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/api/users")
 public interface UserApi {
@@ -29,6 +29,9 @@ public interface UserApi {
     )
     @GetMapping("/{userId}")
     ResponseEntity<UserResponseDto> getUserById(@PathVariable long userId);
+
+    @PutMapping()
+    ResponseEntity<UserResponseDto> updateUser(@RequestBody UserRequestDto updateRequest);
 
 //    @GetMapping("/bookings/{userId}")
 //    ResponseEntity<List<BookingResponseDto>> getBookingsByUser(@PathVariable Long userId);

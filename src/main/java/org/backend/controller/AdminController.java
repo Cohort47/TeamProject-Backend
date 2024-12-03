@@ -22,40 +22,51 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminController implements AdminApi {
 
-    private final UserService service;
+    private final UserService userService;
     private final TourService tourService;
 
     @Override
     public ResponseEntity<List<UserResponseDto>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+        return ResponseEntity.ok(userService.findAll());
     }
 
     @Override
-    public ResponseEntity<List<UserResponseDto>> deleteUser(Long userId) { service.deleteUserById(userId);
-        List<UserResponseDto> remainingUsers = service.findAll();
+    public ResponseEntity<List<UserResponseDto>> deleteUser(Long userId) {
+        userService.deleteUserById(userId);
+        List<UserResponseDto> remainingUsers = userService.findAll();
         // Обновленный список пользователей
          return ResponseEntity.ok(remainingUsers);
-             }
+    }
 
     @Override
     public ResponseEntity<UserResponseDto> makeUserBan(String email) {
-        return ResponseEntity.ok(service.makeUserBanned(email));
+        return ResponseEntity.ok(userService.makeUserBanned(email));
     }
 
     @Override
-    public ResponseEntity<List<UserResponseDto>> findAllFull() {
-        return ResponseEntity.ok(service.findAllFull());
+    public ResponseEntity<UserResponseDto> updateUserRole(Long id, String role) {
+        UserResponseDto updatedUserRole = userService.updateUserRole(id, role);
+        return ResponseEntity.ok(updatedUserRole);
     }
+
 
     @Override
     public ResponseEntity<List<ConfirmationCode>> findAllCodes(String email) {
-        return ResponseEntity.ok(service.findCodesByUser(email));
+        return ResponseEntity.ok(userService.findCodesByUser(email));
     }
 
     @Override
     public ResponseEntity<TourResponseDto> updateTour(Long id, TourRequestDto updateRequest) {
         TourResponseDto updatedTour = tourService.updateTour(id, updateRequest);
         return ResponseEntity.ok(updatedTour);
+    }
+
+    public ResponseEntity<List<TourResponseDto>> deleteTour(Long id) {
+        tourService.deleteTour(id);
+
+        List<TourResponseDto> remainingTours = tourService.findAll();
+
+        return ResponseEntity.ok(remainingTours);
     }
 
 

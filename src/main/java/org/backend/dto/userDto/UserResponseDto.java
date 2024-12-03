@@ -21,6 +21,7 @@ public class UserResponseDto {
     private String email;
     private String role;
 
+
     public static UserResponseDto from(User user) {
         return UserResponseDto.builder()
                 .id(user.getId())

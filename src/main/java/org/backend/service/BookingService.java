@@ -77,8 +77,10 @@ public class BookingService {
     }
 
 
-    public List<BookingResponseDto> findAll() {
-        List<Booking> bookings = bookingRepository.findAll();
+    public List<BookingResponseDto> findAll(String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new NotFoundException("User with email " + userEmail + " not found"));
+        List<Booking> bookings = bookingRepository.findByUserId(user.getId());
         if (bookings.isEmpty()) {
             throw new NotFoundException("No bookings found");
         }
