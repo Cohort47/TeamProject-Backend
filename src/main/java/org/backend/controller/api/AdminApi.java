@@ -23,7 +23,7 @@ public interface AdminApi {
     @PutMapping("/give-role/{id}")
     ResponseEntity<UserResponseDto> updateUserRole( @PathVariable("id") Long id, @RequestParam String role );
 
-    @GetMapping("/ban")
+    @PutMapping("/ban")
     ResponseEntity<UserResponseDto> makeUserBan(@RequestParam String email);
 
 
