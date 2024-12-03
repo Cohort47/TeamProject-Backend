@@ -1,12 +1,15 @@
 package org.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -58,5 +61,9 @@ public class User {
     private State state;
 
     private String photoLink;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore // Это игнорирует сериалиацию связанного списка bookings
+    private List<Booking> bookings = new ArrayList<>();
 
 }

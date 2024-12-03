@@ -1,5 +1,6 @@
 package org.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
@@ -8,6 +9,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -51,12 +55,19 @@ public class Tour {
     @Enumerated(value = EnumType.STRING)
     private Tour.State state;
 
-    private String photoLink;
+    @ElementCollection
+    @CollectionTable(name = "tour_photos", joinColumns = @JoinColumn(name = "tour_id"))
+    @Column(name = "photo_link")
+    private List<String> photoLinks = new ArrayList<>();
 
     @Column(nullable = false)
     private String country;
 
     @Column(nullable = false)
     private String city;
+
+    @OneToMany(mappedBy = "tour", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Booking> bookings = new ArrayList<>();
 
 }

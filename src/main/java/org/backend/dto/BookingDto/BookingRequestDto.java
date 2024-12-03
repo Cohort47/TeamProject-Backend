@@ -14,21 +14,15 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class BookingRequestDto {
 
-    @NotBlank(message = "UserId is required")
-    private Long userId;
 
-    @NotBlank(message = "TourId is required")
-    private String tourId;
+    @NotBlank(message = "Tour ID not be empty")
+    private Long tourId;
 
-    @NotBlank(message = "Booking.State is required")
-    private Booking.State state;
 
-    @NotBlank(message = "Booking duration is required")
-    private Long duration;
+    @NotBlank(message = "Booking tourDate not be empty")
+    private LocalDate tourDate; // Дата начала тура
 
-    @NotBlank(message = "Booking startDate is required")
-    private LocalDate startDate;
+    @NotBlank(message = "Booking amountOfPeople not be empty")
+    private Integer amountOfPeople;
 
-    @NotBlank(message = "Booking endDate is required")
-    private LocalDate endDate;
 }

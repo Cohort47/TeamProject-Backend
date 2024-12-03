@@ -44,13 +44,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth").permitAll()
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/api/tours/**").permitAll()
-                        .requestMatchers("/api/books/**").hasAnyRole("USER","ADMIN")
+                        .requestMatchers("/api/bookings/**").hasAnyRole("USER","ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/users/**").hasAnyRole("USER","ADMIN")
                         .anyRequest().authenticated())
                 .exceptionHandling(eh -> eh
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.FORBIDDEN)))
-                //.addFilterBefore(new BasicAuthFilter(authenticationManager(http.getSharedObject(AuthenticationConfiguration.class))), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new BasicAuthFilter(authenticationManager(http.getSharedObject(AuthenticationConfiguration.class))), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
