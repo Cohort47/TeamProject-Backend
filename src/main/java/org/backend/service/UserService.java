@@ -3,8 +3,8 @@ package org.backend.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.backend.dto.userDto.NewUserDto;
-import org.backend.dto.userDto.UserDto;
+import org.backend.dto.userDto.UserRequestDto;
+import org.backend.dto.userDto.UserResponseDto;
 import org.backend.entity.ConfirmationCode;
 import org.backend.entity.User;
 import org.backend.repository.ConfirmationCodeRepository;
@@ -31,7 +31,7 @@ public class UserService{
 
 
     @Transactional
-    public UserDto registration(NewUserDto newUser) {
+    public UserResponseDto registration(UserRequestDto newUser) {
 
         if (userRepository.existsByEmail(newUser.getEmail())) {
             throw new AlreadyExistException("User with email: "
@@ -59,7 +59,7 @@ public class UserService{
 
         //sendEmail(user,code);
 
-        return UserDto.from(user);
+        return UserResponseDto.from(user);
 
     }
 
@@ -86,7 +86,7 @@ public class UserService{
 
 
     @Transactional
-    public UserDto confirmation(String confirmCode) {
+    public UserResponseDto confirmation(String confirmCode) {
 
         ConfirmationCode code = confirmationCodeRepository
                 .findByCodeAndExpiredDateTimeAfter(confirmCode, LocalDateTime.now())
@@ -100,25 +100,32 @@ public class UserService{
         user.setState(User.State.CONFIRMED);
         userRepository.save(user);
 
-        return UserDto.from(user);
+        return UserResponseDto.from(user);
 
     }
 
 
-    public List<UserDto> findAll() {
-        return UserDto.from(userRepository.findAll());
+    public List<UserResponseDto> findAll() {
+        return UserResponseDto.from(userRepository.findAll());
     }
 
-    public UserDto getUserById(Long userId) {
+    public UserResponseDto getUserById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with ID "
                         + userId + " not found"));
-        return UserDto.from(user);
+        return UserResponseDto.from(user);
+    }
+
+    public UserResponseDto getUserByEmail(String email ) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User with ID "
+                        + email + " not found"));
+        return UserResponseDto.from(user);
     }
 
 
     @Transactional
-    public UserDto makeUserBanned(String email) {
+    public UserResponseDto makeUserBanned(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("User with email "
                         + email + " not found"));
@@ -126,11 +133,11 @@ public class UserService{
         user.setState(User.State.BANNED);
         userRepository.save(user);
 
-        return UserDto.from(user);
+        return UserResponseDto.from(user);
     }
 
-    public List<User> findAllFull() {
-        return userRepository.findAll();
+    public List<UserResponseDto> findAllFull() {
+        return UserResponseDto.from(userRepository.findAll());
     }
 
     public List<ConfirmationCode> findCodesByUser(String email) {
@@ -140,6 +147,8 @@ public class UserService{
 
         return confirmationCodeRepository.findByUser(user);
     }
+
+
 
     public void deleteUserById(Long userId) {
         // Удаление пользователя по id

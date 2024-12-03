@@ -1,20 +1,28 @@
 package org.backend.dto.userDto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserRequestDto {
-    @NotBlank(message = "User firstName is required")
-    private String userFirstName;
+    @NotBlank (message = "User firstName should not be empty")
+    private String firstName;
 
-    @NotBlank(message = "User lastName is required")
-    private String userLastName;
+    @NotBlank (message = "User lastName should not be empty")
+    private String lastName;
 
-    @NotBlank(message = "User email is required")
+    @Email (message = "Incorrect email format")
+    @NotBlank (message = "User email should not be empty")
     private String email;
+
+    @NotBlank (message = "User password should not be empty")
+    private String hashPassword;
+
 }

@@ -2,11 +2,10 @@ package org.backend.controller.api;
 
 
 
-import org.backend.dto.tourDto.TourDto;
-import org.backend.dto.tourDto.TourUpdateRequest;
-import org.backend.dto.userDto.UserDto;
+import org.backend.dto.tourDto.TourRequestDto;
+import org.backend.dto.tourDto.TourResponseDto;
+import org.backend.dto.userDto.UserResponseDto;
 import org.backend.entity.ConfirmationCode;
-import org.backend.entity.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,17 +15,17 @@ import java.util.List;
 public interface AdminApi {
 
     @GetMapping("/users")
-    ResponseEntity<List<UserDto>> findAll();
+    ResponseEntity<List<UserResponseDto>> findAll();
 
     @DeleteMapping("/users/{userId}")
-    ResponseEntity<List<UserDto>> deleteUser(@PathVariable Long userId);
+    ResponseEntity<List<UserResponseDto>> deleteUser(@PathVariable Long userId);
 
     @GetMapping("/ban")
-    ResponseEntity<UserDto> makeUserBan(@RequestParam String email);
+    ResponseEntity<UserResponseDto> makeUserBan(@RequestParam String email);
 
 
     @GetMapping("/users/full-details")
-    ResponseEntity<List<User>> findAllFull();
+    ResponseEntity<List<UserResponseDto>> findAllFull();
 
     @GetMapping("/users/all-codes")
     ResponseEntity<List<ConfirmationCode>> findAllCodes(@RequestParam String email);
@@ -34,7 +33,7 @@ public interface AdminApi {
 
     //Обновление тура
     @PutMapping("/tours/{id}")
-    ResponseEntity<TourDto> updateTour(@PathVariable Long id, @RequestBody TourUpdateRequest updateRequest);
+    ResponseEntity<TourResponseDto> updateTour(@PathVariable Long id, @RequestBody TourRequestDto updateRequest);
 
 
 }

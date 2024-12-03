@@ -3,7 +3,7 @@ package org.backend.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.backend.dto.BookingDto.BookingDto;
+import org.backend.dto.BookingDto.BookingResponseDto;
 import org.backend.entity.Booking;
 import org.backend.entity.Tour;
 import org.backend.entity.User;
@@ -11,13 +11,11 @@ import org.backend.repository.BookingRepository;
 import org.backend.repository.TourRepository;
 import org.backend.repository.UserRepository;
 import org.backend.service.exception.NotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -30,9 +28,9 @@ public class BookingService {
 
 
     @Transactional
-    public Booking createBooking(Long userId, Long tourId, LocalDate tourDate) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User with ID " + userId + " not found"));
+    public BookingResponseDto createBooking(String userEmail, Long tourId, LocalDate tourDate, Integer amountOfPeople) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new NotFoundException("User with ID " + userEmail + " not found"));
         Tour tour = tourRepository.findById(tourId)
                 .orElseThrow(() -> new NotFoundException("Tour with ID " + tourId + " not found"));
 
@@ -47,84 +45,56 @@ public class BookingService {
         booking.setBookingDate(LocalDate.now());
         // Дата тура от пользователя
         booking.setTourDate(tourDate);
-        booking.setState(Booking.State.AVAILABLE);
+        booking.setState(Booking.State.BOOKED);
+        booking.setAmountOfPeople(amountOfPeople);
 
 
-        return bookingRepository.save(booking);
+        return  BookingResponseDto.from(bookingRepository.save(booking));
     }
 
     @Transactional
-    public BookingDto getBookingById(Long bookingId) {
+    public BookingResponseDto getBookingById(Long bookingId) {
         Booking booking = bookingRepository
                 .findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Booking with ID "
                         + bookingId + " not found"));
-        return BookingDto.from(booking); }
+        return BookingResponseDto.from(booking);
+    }
 
+    @Transactional(readOnly = true)
+    public List<BookingResponseDto> getBookings(String userEmail, Booking.State state, LocalDate bookingDate, LocalDate tourDate, Long tourId, Integer amountOfPeople) {
+        // Получаем пользователя по email
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new NotFoundException("User with email " + userEmail + " not found"));
 
-    public List<BookingDto> getBookingsByTourDate(LocalDate tourDate) {
-        List<Booking> bookings = bookingRepository.findByTourDate(tourDate);
-        if (bookings.isEmpty()) {
-            throw new NotFoundException("No bookings found for tour date " + tourDate);
-        }
+        // Выполняем фильтрацию через репозиторий
+        List<Booking> bookings = bookingRepository.getBookings(user.getId(), state, bookingDate, tourDate, tourId, amountOfPeople);
+
+        // Преобразуем список объектов Booking в BookingResponseDto
         return bookings.stream()
-                .map(BookingDto::from)
-                .toList();
-    }
-
-    public  List<BookingDto>  getBookingsByBookingDate(LocalDate bookingDate) {
-        List<Booking> bookings = bookingRepository.findByBookingDate(bookingDate);
-        if (bookings.isEmpty()) {
-            throw new NotFoundException("No bookings found for tour date " + bookingDate);
-        }
-        return bookings.stream()
-                .map(BookingDto::from)
-                .toList();
-    }
-
-    public List<BookingDto> getBookingsByUser(Long userId) {
-        return bookingRepository.findByUserId(userId)
-                .stream()
-                .map(BookingDto::from)
-                .collect(Collectors.toList());
-    }
-
-    public List<BookingDto> getBookingsByTour(Long tourId) {
-        return bookingRepository.findByTourId(tourId)
-                .stream()
-                .map(BookingDto::from)
-                .collect(Collectors.toList());
-    }
-
-    public List<BookingDto> findBookingByState(Booking.State state) {
-        // Получаем все заказы с указанным состоянием из репозитория
-        List<Booking> bookings = bookingRepository.findBookingByState(state);
-
-        // Преобразуем найденные заказы в BookingDto и возвращаем их
-        return bookings.stream()
-                .map(BookingDto::from)
+                .map(BookingResponseDto::from) // Преобразуем каждый Booking в BookingResponseDto
                 .toList();
     }
 
 
-    public List<BookingDto> findAll() {
+    public List<BookingResponseDto> findAll() {
         List<Booking> bookings = bookingRepository.findAll();
         if (bookings.isEmpty()) {
             throw new NotFoundException("No bookings found");
         }
         return bookings.stream()
-                .map(BookingDto::from)
+                .map(BookingResponseDto::from)
                 .toList();
     }
 
     @Transactional
-    public Booking updateBookingState (Long bookingId, Booking.State newState){
+    public BookingResponseDto updateBookingState (Long bookingId, Booking.State newState){
         Booking booking = bookingRepository
                 .findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Booking with ID "
                         + bookingId + " not found"));
         booking.setState(newState);
-        return bookingRepository.save(booking);
+        return BookingResponseDto.from(bookingRepository.save(booking));
     }
 
     @Transactional

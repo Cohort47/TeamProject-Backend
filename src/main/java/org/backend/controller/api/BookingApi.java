@@ -6,7 +6,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.backend.dto.BookingDto.BookingDto;
+import org.backend.dto.BookingDto.BookingRequestDto;
+import org.backend.dto.BookingDto.BookingResponseDto;
 import org.backend.dto.responseDto.ErrorResponseDto;
 import org.backend.entity.Booking;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public interface BookingApi {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Booking information",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = BookingDto.class))),
+                            schema = @Schema(implementation = BookingResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "Booking not found",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponseDto.class)))
@@ -31,28 +32,27 @@ public interface BookingApi {
     )
 
     @PostMapping
-    ResponseEntity<Booking> createBooking(@RequestParam Long userId, @RequestParam Long tourId, @RequestParam LocalDate tourDate);
+    ResponseEntity<BookingResponseDto> createBooking(@RequestBody BookingRequestDto request);
 
     @PutMapping("/{bookingId}")
-    ResponseEntity<Booking> updateBookingState(@PathVariable Long bookingId, @RequestParam Booking.State newState);
+    ResponseEntity<BookingResponseDto> updateBookingState(@PathVariable Long bookingId, @RequestParam Booking.State newState);
 
     @DeleteMapping("/{bookingId}")
     ResponseEntity<Void> deleteBooking(@PathVariable Long bookingId);
 
     @GetMapping("/{bookingId}")
-    ResponseEntity<BookingDto> getBookingById(@PathVariable Long bookingId);
+    ResponseEntity<BookingResponseDto> getBookingById(@PathVariable Long bookingId);
 
-    @GetMapping
-    ResponseEntity<List<BookingDto>> findAll();
+    @GetMapping("/all")
+    ResponseEntity<List<BookingResponseDto>> findAll();
 
-    @GetMapping("/state/{state}")
-    ResponseEntity<List<BookingDto>> findBookingByState(@PathVariable Booking.State state);
-
-    @GetMapping("/bookingDate/{bookingDate}")
-    ResponseEntity<List<BookingDto>> getBookingsByBookingDate(@PathVariable LocalDate bookingDate);
-
-    @GetMapping("/tourDate/{tourDate}")
-    ResponseEntity<List<BookingDto>> getBookingsByTourDate(@PathVariable LocalDate tourDate);
-
+    @GetMapping()
+    ResponseEntity<List<BookingResponseDto>>  getBookings(
+            @RequestParam(required = false) Booking.State state,
+            @RequestParam(required = false) LocalDate bookingDate,
+            @RequestParam(required = false) LocalDate tourDate,
+            @RequestParam(required = false) Long tourId,
+            @RequestParam(required = false) Integer amountOfPeople
+    );
 
 }

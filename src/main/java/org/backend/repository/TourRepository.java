@@ -3,6 +3,8 @@ package org.backend.repository;
 
 import org.backend.entity.Tour;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -47,4 +49,23 @@ public interface TourRepository extends JpaRepository<Tour, Long> {
     // Find tours by city
     List<Tour> findByCity(String city);
 
+
+
+    @Query("SELECT t FROM Tour t WHERE " +
+            "(:title IS NULL OR LOWER(t.title) LIKE LOWER(CONCAT('%', :title, '%'))) AND " +
+            "(:state IS NULL OR t.state = :state) AND " +
+            "(:price IS NULL OR t.price <= :price) AND " +
+            "(:duration IS NULL OR t.duration <= :duration) AND " +
+            "(:startDate IS NULL OR t.startDate >= :startDate) AND " +
+            "(:endDate IS NULL OR t.endDate <= :endDate) AND " +
+            "(:country IS NULL OR LOWER(t.country) = LOWER(:country)) AND " +
+            "(:city IS NULL OR LOWER(t.city) = LOWER(:city))")
+    List<Tour> searchTours(@Param("title") String title,
+                           @Param("state") Tour.State state,
+                           @Param("price") Long price,
+                           @Param("duration") Long duration,
+                           @Param("startDate") LocalDate startDate,
+                           @Param("endDate") LocalDate endDate,
+                           @Param("country") String country,
+                           @Param("city") String city);
 }

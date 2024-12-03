@@ -15,7 +15,6 @@ import java.time.LocalDate;
 public class Booking {
 
     public enum State {
-        AVAILABLE,
         BOOKED,
         PAID,
         CANCELLED
@@ -47,5 +46,8 @@ public class Booking {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private State state;
+
+    @Column(nullable = false)
+    private Integer amountOfPeople;
 
 }

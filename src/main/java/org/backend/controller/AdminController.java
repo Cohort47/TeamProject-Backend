@@ -6,11 +6,10 @@ package org.backend.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.backend.controller.api.AdminApi;
-import org.backend.dto.tourDto.TourDto;
-import org.backend.dto.tourDto.TourUpdateRequest;
-import org.backend.dto.userDto.UserDto;
+import org.backend.dto.tourDto.TourRequestDto;
+import org.backend.dto.tourDto.TourResponseDto;
+import org.backend.dto.userDto.UserResponseDto;
 import org.backend.entity.ConfirmationCode;
-import org.backend.entity.User;
 import org.backend.service.TourService;
 import org.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -27,24 +26,24 @@ public class AdminController implements AdminApi {
     private final TourService tourService;
 
     @Override
-    public ResponseEntity<List<UserDto>> findAll() {
+    public ResponseEntity<List<UserResponseDto>> findAll() {
         return ResponseEntity.ok(service.findAll());
     }
 
     @Override
-    public ResponseEntity<List<UserDto>> deleteUser(Long userId) { service.deleteUserById(userId);
-        List<UserDto> remainingUsers = service.findAll();
+    public ResponseEntity<List<UserResponseDto>> deleteUser(Long userId) { service.deleteUserById(userId);
+        List<UserResponseDto> remainingUsers = service.findAll();
         // Обновленный список пользователей
          return ResponseEntity.ok(remainingUsers);
              }
 
     @Override
-    public ResponseEntity<UserDto> makeUserBan(String email) {
+    public ResponseEntity<UserResponseDto> makeUserBan(String email) {
         return ResponseEntity.ok(service.makeUserBanned(email));
     }
 
     @Override
-    public ResponseEntity<List<User>> findAllFull() {
+    public ResponseEntity<List<UserResponseDto>> findAllFull() {
         return ResponseEntity.ok(service.findAllFull());
     }
 
@@ -54,8 +53,8 @@ public class AdminController implements AdminApi {
     }
 
     @Override
-    public ResponseEntity<TourDto> updateTour(Long id, TourUpdateRequest updateRequest) {
-        TourDto updatedTour = tourService.updateTour(id, updateRequest);
+    public ResponseEntity<TourResponseDto> updateTour(Long id, TourRequestDto updateRequest) {
+        TourResponseDto updatedTour = tourService.updateTour(id, updateRequest);
         return ResponseEntity.ok(updatedTour);
     }
 

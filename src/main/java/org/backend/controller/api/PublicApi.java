@@ -8,8 +8,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.backend.dto.responseDto.ErrorResponseDto;
-import org.backend.dto.userDto.NewUserDto;
-import org.backend.dto.userDto.UserDto;
+import org.backend.dto.userDto.UserRequestDto;
+import org.backend.dto.userDto.UserResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,16 +20,16 @@ public interface PublicApi {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User registered successfully",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = UserDto.class))),
+                            schema = @Schema(implementation = UserResponseDto.class))),
             @ApiResponse(responseCode = "400", description = "Validation error",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponseDto.class)))
     }
     )
     @PostMapping("/register")
-    public ResponseEntity<UserDto> userRegistration(@Valid @RequestBody NewUserDto request);
+     ResponseEntity<UserResponseDto> userRegistration(@Valid @RequestBody UserRequestDto request);
 
     @GetMapping("/confirm")
-    public ResponseEntity<UserDto> confirmRegistration(@RequestParam String code);
+    ResponseEntity<UserResponseDto> confirmRegistration(@RequestParam String code);
 
 }
