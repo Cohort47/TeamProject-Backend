@@ -43,6 +43,7 @@ public interface BookingApi {
     @GetMapping("/{bookingId}")
     ResponseEntity<BookingResponseDto> getBookingById(@PathVariable Long bookingId);
 
+    //TODO Удалить
     @GetMapping("/all")
     ResponseEntity<List<BookingResponseDto>> findAll();
 

@@ -52,6 +52,32 @@ public class BookingService {
         return  BookingResponseDto.from(bookingRepository.save(booking));
     }
 
+    @Transactional(readOnly = true)
+    public List<BookingResponseDto> getAllBookings() {
+        List<Booking> bookings = bookingRepository.findAll();
+        if (bookings.isEmpty()) {
+            throw new NotFoundException("No bookings found");
+        }
+        return bookings.stream()
+                .map(BookingResponseDto::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<BookingResponseDto> getBookingsByUserId(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User with ID " + userId + " not found"));
+
+        List<Booking> bookings = bookingRepository.findByUserId(user.getId());
+        if (bookings.isEmpty()) {
+            throw new NotFoundException("No bookings found for user with ID " + userId);
+        }
+        return bookings.stream()
+                .map(BookingResponseDto::from)
+                .toList();
+    }
+
+
     @Transactional
     public BookingResponseDto getBookingById(Long bookingId) {
         Booking booking = bookingRepository
@@ -76,7 +102,7 @@ public class BookingService {
                 .toList();
     }
 
-
+    @Transactional
     public List<BookingResponseDto> findAll(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new NotFoundException("User with email " + userEmail + " not found"));

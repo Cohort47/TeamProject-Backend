@@ -2,6 +2,7 @@ package org.backend.controller.api;
 
 
 
+import org.backend.dto.BookingDto.BookingResponseDto;
 import org.backend.dto.tourDto.TourRequestDto;
 import org.backend.dto.tourDto.TourResponseDto;
 import org.backend.dto.userDto.UserResponseDto;
@@ -15,7 +16,7 @@ import java.util.List;
 public interface AdminApi {
 
     @GetMapping("/users")
-    ResponseEntity<List<UserResponseDto>> findAll();
+    ResponseEntity<List<UserResponseDto>> findAllUsers();
 
     @DeleteMapping("/users/{userId}")
     ResponseEntity<List<UserResponseDto>> deleteUser(@PathVariable Long userId);
@@ -30,6 +31,11 @@ public interface AdminApi {
     @GetMapping("/users/all-codes")
     ResponseEntity<List<ConfirmationCode>> findAllCodes(@RequestParam String email);
 
+    @GetMapping("/bookings")
+    ResponseEntity<List<BookingResponseDto>> findAllBookings();
+
+    @GetMapping("/bookings/{userId}")
+    ResponseEntity<List<BookingResponseDto>> findBookingsByUserId(@PathVariable Long userId);
 
     //Обновление тура
     @PutMapping("/tours/{id}")

@@ -6,13 +6,16 @@ package org.backend.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.backend.controller.api.AdminApi;
+import org.backend.dto.BookingDto.BookingResponseDto;
 import org.backend.dto.tourDto.TourRequestDto;
 import org.backend.dto.tourDto.TourResponseDto;
 import org.backend.dto.userDto.UserResponseDto;
 import org.backend.entity.ConfirmationCode;
+import org.backend.service.BookingService;
 import org.backend.service.TourService;
 import org.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -24,9 +27,10 @@ public class AdminController implements AdminApi {
 
     private final UserService userService;
     private final TourService tourService;
+    private final BookingService bookingService;
 
     @Override
-    public ResponseEntity<List<UserResponseDto>> findAll() {
+    public ResponseEntity<List<UserResponseDto>> findAllUsers() {
         return ResponseEntity.ok(userService.findAll());
     }
 
@@ -69,6 +73,15 @@ public class AdminController implements AdminApi {
         return ResponseEntity.ok(remainingTours);
     }
 
+    @Override
+    public ResponseEntity<List<BookingResponseDto>> findAllBookings() {
+        return ResponseEntity.ok(bookingService.getAllBookings());
+    }
 
+
+    @Override
+    public ResponseEntity<List<BookingResponseDto>> findBookingsByUserId(Long userId) {
+        return ResponseEntity.ok(bookingService.getBookingsByUserId(userId));
+    }
 }
 
