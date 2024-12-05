@@ -3,11 +3,12 @@ package org.backend.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.backend.controller.api.TourApi;
-
-import org.backend.dto.tourDto.TourDto;
-import org.backend.entity.Tour;
+import org.backend.dto.tourDto.TourResponseDto;
 import org.backend.service.TourService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
@@ -18,53 +19,34 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TourController implements TourApi {
 
-
-    private final TourService service;
-
-    @Override
-    public ResponseEntity<List<TourDto>> findAll() {
-        return ResponseEntity.ok(service.findAll());
-    }
-
+    private final TourService tourService;
 
 
     @Override
-    public ResponseEntity<List<Tour>> findAllFull() {
-        return ResponseEntity.ok(service.findAllFull());
+    public ResponseEntity<List<TourResponseDto>> findAll() {
+        return ResponseEntity.ok(tourService.findAll());
     }
 
     @Override
-    public ResponseEntity<TourDto> getTourById(long tourId) {
-        return ResponseEntity.ok(service.getTourById(tourId));
+    public ResponseEntity<TourResponseDto> getTourById(@PathVariable long tourId) {
+        return ResponseEntity.ok(tourService.getTourById(tourId));
     }
 
     @Override
-    public ResponseEntity<TourDto> getTourByTitle(String tourTitle) {
-        return ResponseEntity.ok(service.getTourByTitle(tourTitle));
-    }
+    public ResponseEntity<List<TourResponseDto>> getTours(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String state,
+            @RequestParam(required = false) Long price,
+            @RequestParam(required = false) Long duration,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) String country,
+            @RequestParam(required = false) String city) {
 
-    @Override
-    public ResponseEntity<TourDto> getTourByState(String tourState) {
-        return ResponseEntity.ok(service.getTourByState(tourState));
-    }
-
-    @Override
-    public ResponseEntity<TourDto> getTourByPrice(long tourPrice) {
-        return ResponseEntity.ok(service.getTourByPrice(tourPrice));
-    }
-
-    @Override
-    public ResponseEntity<TourDto> getTourByDuration(long tourDuration) {
-        return ResponseEntity.ok(service.getTourByDuration(tourDuration));
-    }
-
-    @Override
-    public ResponseEntity<TourDto> getTourByStartDate(LocalDate tourStartDate) {
-        return ResponseEntity.ok(service.getTourByStartDate(tourStartDate));
-    }
-
-    @Override
-    public ResponseEntity<TourDto> getTourByEndDate(LocalDate tourEndDate) {
-        return ResponseEntity.ok(service.getTourByEndDate(tourEndDate));
+        List<TourResponseDto> tours = tourService.searchTours(title, state, price, duration, startDate, endDate, country, city);
+        if (tours.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(tours);
     }
 }

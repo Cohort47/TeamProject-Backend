@@ -2,9 +2,11 @@ package org.backend.service;
 
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.backend.dto.userDto.NewUserDto;
-import org.backend.dto.userDto.UserDto;
+import org.apache.coyote.BadRequestException;
+import org.backend.dto.userDto.UserRequestDto;
+import org.backend.dto.userDto.UserResponseDto;
 import org.backend.entity.ConfirmationCode;
 import org.backend.entity.User;
 import org.backend.repository.ConfirmationCodeRepository;
@@ -12,38 +14,41 @@ import org.backend.repository.UserRepository;
 import org.backend.service.exception.AlreadyExistException;
 import org.backend.service.exception.NotFoundException;
 import org.backend.service.mail.MailUtil;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserService {
+public class UserService{
 
     private final UserRepository userRepository;
     private final ConfirmationCodeRepository confirmationCodeRepository;
     private final MailUtil mailUtil;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Transactional
-    public UserDto registration(NewUserDto newUser) {
+    public UserResponseDto registration(UserRequestDto newUser) {
 
         if (userRepository.existsByEmail(newUser.getEmail())) {
             throw new AlreadyExistException("User with email: "
                             + newUser.getEmail() + " already registered");
         }
 
+
         User user = User.builder()
+
                 .email(newUser.getEmail())
                 .firstName(newUser.getFirstName())
                 .lastName(newUser.getLastName())
-                .hashPassword(newUser.getHashPassword())
+                .hashPassword(passwordEncoder.encode(newUser.getHashPassword()))
+                .state(User.State.CONFIRMED)
                 .role(User.Role.USER)
-                .state(User.State.NOT_CONFIRMED)
                 .build();
 
         userRepository.save(user);
@@ -56,7 +61,7 @@ public class UserService {
 
         //sendEmail(user,code);
 
-        return UserDto.from(user);
+        return UserResponseDto.from(user);
 
     }
 
@@ -83,7 +88,7 @@ public class UserService {
 
 
     @Transactional
-    public UserDto confirmation(String confirmCode) {
+    public UserResponseDto confirmation(String confirmCode) {
 
         ConfirmationCode code = confirmationCodeRepository
                 .findByCodeAndExpiredDateTimeAfter(confirmCode, LocalDateTime.now())
@@ -97,25 +102,32 @@ public class UserService {
         user.setState(User.State.CONFIRMED);
         userRepository.save(user);
 
-        return UserDto.from(user);
+        return UserResponseDto.from(user);
 
     }
 
 
-    public List<UserDto> findAll() {
-        return UserDto.from(userRepository.findAll());
+    public List<UserResponseDto> findAll() {
+        return UserResponseDto.from(userRepository.findAll());
     }
 
-    public UserDto getUserById(Long userId) {
+    public UserResponseDto getUserById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with ID "
                         + userId + " not found"));
-        return UserDto.from(user);
+        return UserResponseDto.from(user);
+    }
+
+    public UserResponseDto getUserByEmail(String email ) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User with ID "
+                        + email + " not found"));
+        return UserResponseDto.from(user);
     }
 
 
     @Transactional
-    public UserDto makeUserBanned(String email) {
+    public UserResponseDto makeUserBanned(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("User with email "
                         + email + " not found"));
@@ -123,12 +135,56 @@ public class UserService {
         user.setState(User.State.BANNED);
         userRepository.save(user);
 
-        return UserDto.from(user);
+        return UserResponseDto.from(user);
     }
 
-    public List<User> findAllFull() {
-        return userRepository.findAll();
+    public List<UserResponseDto> findAllFull() {
+        return UserResponseDto.from(userRepository.findAll());
     }
+
+    public UserResponseDto updateUser(String userEmail, UserRequestDto updateRequest) {
+        // Проверяем, существует ли пользователь с данным id
+        User existingUser = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new NotFoundException("User with ID " + userEmail + " not found"));
+
+        // Обновляем поля пользователя
+        existingUser.setFirstName(updateRequest.getFirstName() != null ? updateRequest.getFirstName() : existingUser.getFirstName());
+        existingUser.setLastName(updateRequest.getLastName() != null ? updateRequest.getLastName() : existingUser.getLastName());
+        existingUser.setEmail(updateRequest.getEmail() != null ? updateRequest.getEmail() : existingUser.getEmail());
+        existingUser.setHashPassword(updateRequest.getHashPassword() != null ? updateRequest.getHashPassword() : existingUser.getHashPassword());
+
+        // Сохраняем обновленные данные пользователя в базу данных
+        User updatedUser = userRepository.save(existingUser);
+
+        // Возвращаем обновленные данные пользователя в виде DTO
+        return UserResponseDto.from(updatedUser);
+    }
+
+    @SneakyThrows
+    public UserResponseDto updateUserRole(Long id, String role) {
+        // Найти пользователя по ID
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User with ID " + id + " not found"));
+
+        // Проверить, является ли переданная роль допустимой
+        User.Role newRole;
+        try {
+            newRole = User.Role.valueOf(role.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid role: " + role);
+        }
+
+        // Установить новую роль пользователю
+        existingUser.setRole(newRole);
+
+        // Сохранить изменения в базе данных
+        User updatedUser = userRepository.save(existingUser);
+
+        // Вернуть обновленные данные пользователя в виде DTO
+        return UserResponseDto.from(updatedUser);
+    }
+
+
 
     public List<ConfirmationCode> findCodesByUser(String email) {
         User user = userRepository.findByEmail(email)
@@ -138,8 +194,18 @@ public class UserService {
         return confirmationCodeRepository.findByUser(user);
     }
 
+
+
     public void deleteUserById(Long userId) {
         // Удаление пользователя по id
-         userRepository.deleteById(userId); }
+         userRepository.deleteById(userId);
     }
+
+
+}
+
+
+
+
+
 
