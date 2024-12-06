@@ -21,6 +21,7 @@ public interface TourRepository extends JpaRepository<Tour, Long> {
     // Check existence by ID
     boolean existsById(Long id);
 
+
     // Find tours by title
     List<Tour> findByTitle(String title);
 

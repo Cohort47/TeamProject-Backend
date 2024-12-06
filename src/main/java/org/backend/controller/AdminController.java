@@ -14,6 +14,7 @@ import org.backend.entity.ConfirmationCode;
 import org.backend.service.BookingService;
 import org.backend.service.TourService;
 import org.backend.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
@@ -72,6 +73,13 @@ public class AdminController implements AdminApi {
 
         return ResponseEntity.ok(remainingTours);
     }
+
+    @Override
+    public ResponseEntity<TourResponseDto> createTour(TourRequestDto newTour) {
+        TourResponseDto tourResponseDto = tourService.addTour(newTour);
+        return ResponseEntity.status(HttpStatus.CREATED).body(tourResponseDto);
+    }
+
 
     @Override
     public ResponseEntity<List<BookingResponseDto>> findAllBookings() {
