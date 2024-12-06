@@ -7,12 +7,14 @@ import org.backend.dto.tourDto.TourRequestDto;
 import org.backend.dto.tourDto.TourResponseDto;
 import org.backend.entity.Tour;
 import org.backend.repository.TourRepository;
+import org.backend.service.exception.AlreadyExistException;
 import org.backend.service.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -20,6 +22,27 @@ import java.util.List;
 @Slf4j
 public class TourService {
     private final TourRepository tourRepository;
+
+    public TourResponseDto addTour(TourRequestDto newTour) {
+
+        Tour tour = Tour.builder()
+                .title(newTour.getTitle())
+                .description(newTour.getDescription())
+                .price(newTour.getPrice())
+                .duration(newTour.getDuration())
+                .startDate(newTour.getStartDate())
+                .endDate(newTour.getEndDate())
+                .state(Tour.State.valueOf(newTour.getState()))
+                .photoLinks(newTour.getPhotoLinks())
+                .country(newTour.getCountry())
+                .city(newTour.getCity())
+                .build();
+
+        tourRepository.save(tour);
+
+        return TourResponseDto.from(tour);
+
+    }
 
 
     public List<TourResponseDto> findAll() {
@@ -50,11 +73,19 @@ public class TourService {
     }
 
     @Transactional
-    public Tour updateTourState(Long tourId, Tour.State newState) {
+    public TourResponseDto updateTourState(Long tourId, String newState) {
         Tour tour = tourRepository.findById(tourId)
                 .orElseThrow(() -> new NotFoundException("Tour with ID " + tourId + " not found"));
-        tour.setState(newState);
-        return tourRepository.save(tour);
+
+        // Преобразуем строку в перечисление State
+        try {
+            Tour.State stateEnum = Tour.State.valueOf(newState.toUpperCase());
+            tour.setState(stateEnum);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid state: " + newState + ". Allowed values are: " + Arrays.toString(Tour.State.values()));
+        }
+
+        return TourResponseDto.from(tourRepository.save(tour));
     }
 
     public TourResponseDto updateTour(Long id, TourRequestDto updateRequest) {

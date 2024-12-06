@@ -44,4 +44,7 @@ public interface AdminApi {
     @DeleteMapping("/tours/{tourId}")
     ResponseEntity<List<TourResponseDto>> deleteTour(@PathVariable Long tourId);
 
+    @PostMapping("/tours")
+    ResponseEntity<TourResponseDto> createTour(@RequestBody TourRequestDto newTour);
+
 }
