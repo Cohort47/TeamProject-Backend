@@ -17,7 +17,11 @@ import org.backend.service.mail.MailUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
+
+import java.util.regex.Pattern;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -31,18 +35,36 @@ public class UserService{
     private final MailUtil mailUtil;
     private final PasswordEncoder passwordEncoder;
 
-
     @Transactional
     public UserResponseDto registration(UserRequestDto newUser) {
+        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
+        Pattern emailPattern = Pattern.compile(emailRegex);
 
-        if (userRepository.existsByEmail(newUser.getEmail())) {
-            throw new AlreadyExistException("User with email: "
-                            + newUser.getEmail() + " already registered");
+        String passwordRegex = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@#$%^&+=!])[A-Za-z\\d@#$%^&+=!]{8,20}$";
+        Pattern passwordPattern = Pattern.compile(passwordRegex);
+
+        if (newUser.getEmail() == null || newUser.getEmail().isEmpty() ||
+                newUser.getFirstName() == null || newUser.getFirstName().isEmpty() ||
+                newUser.getLastName() == null || newUser.getLastName().isEmpty() ||
+                newUser.getHashPassword() == null || newUser.getHashPassword().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "All fields are required");
         }
 
+        if (!emailPattern.matcher(newUser.getEmail()).matches()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid email format");
+        }
+
+        if (!passwordPattern.matcher(newUser.getHashPassword()).matches()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password " +
+                    "must be 8-20 characters long, contain at least one letter, " +
+                    "one number, and one special character (@#$%^&+=!)");
+        }
+
+        if (userRepository.existsByEmail(newUser.getEmail())) {
+            throw new AlreadyExistException("User with email: " + newUser.getEmail() + " already registered");
+        }
 
         User user = User.builder()
-
                 .email(newUser.getEmail())
                 .firstName(newUser.getFirstName())
                 .lastName(newUser.getLastName())
@@ -54,16 +76,16 @@ public class UserService{
         userRepository.save(user);
 
         String code = UUID.randomUUID().toString();
-
         saveConfirmCode(user, code);
 
         // отправка кода по электронной почте
-
-        //sendEmail(user,code);
+        // sendEmail(user, code);
 
         return UserResponseDto.from(user);
-
     }
+
+
+
 
     private void sendEmail(User user, String code) {
         String link = "http://localhost:8080/api/public/confirm?code=" + code;
