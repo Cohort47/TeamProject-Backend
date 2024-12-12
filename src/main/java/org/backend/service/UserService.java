@@ -67,44 +67,62 @@ public class UserService{
 
     private void sendEmail(User user, String code) {
         String link = "http://localhost:8080/api/public/confirm?code=" + code;
-//        log.info("ссылка для отправки email: {}", link);
-        mailUtil.send(
-                user.getFirstName(),
-                user.getLastName(),
-                link,
-                "Code confirmation email",
-                user.getEmail());
+        log.info("Sending email to user: {} {}", user.getFirstName(), user.getLastName());
+        log.info("Confirmation link: {}", link);
+        try {
+            mailUtil.send(
+                    user.getFirstName(),
+                    user.getLastName(),
+                    link,
+                    "Code confirmation email",
+                    user.getEmail());
+            log.info("Email successfully sent to user: {}", user.getEmail());
+        } catch (Exception e) {
+            log.error("Error sending email: {}", e.getMessage(), e);
+        }
     }
+
 
     private void saveConfirmCode(User newUser, String codeUUID) {
-        ConfirmationCode confirmationCode = ConfirmationCode.builder()
-                .code(codeUUID)
-                .user(newUser)
-                .expiredDateTime(LocalDateTime.now().plusDays(1))
-                .build();
+        log.info("Generate a verification code for the user: {}", newUser.getEmail());
 
-        confirmationCodeRepository.save(confirmationCode);
+        try {
+            ConfirmationCode confirmationCode = ConfirmationCode.builder()
+                    .code(codeUUID)
+                    .user(newUser)
+                    .expiredDateTime(LocalDateTime.now().plusDays(1))
+                    .build();
+
+            confirmationCodeRepository.save(confirmationCode);
+            log.info("The verification code has been successfully saved for the user.: {}", newUser.getEmail());
+        } catch (Exception e) {
+            log.error("Error saving verification code for user: {}", newUser.getEmail(), e);
+            throw new IllegalStateException("Failed to save verification code for user: " + newUser.getEmail(), e);
+        }
     }
+
 
 
     @Transactional
     public UserResponseDto confirmation(String confirmCode) {
+        log.info("Start of confirmation for code: {}", confirmCode);
 
         ConfirmationCode code = confirmationCodeRepository
                 .findByCodeAndExpiredDateTimeAfter(confirmCode, LocalDateTime.now())
-                .orElseThrow(() -> new NotFoundException(
-                        "Verification code not found or expired"));
+                .orElseThrow(() -> new NotFoundException("Verification code not found or expired"));
 
         code.setConfirmed(true);
         confirmationCodeRepository.save(code);
+        log.info("The verification code has been successfully verified.: {}", confirmCode);
 
         User user = code.getUser();
         user.setState(User.State.CONFIRMED);
         userRepository.save(user);
+        log.info("User successfully verified: {}", user.getEmail());
 
         return UserResponseDto.from(user);
-
     }
+
 
 
     public List<UserResponseDto> findAll() {
@@ -128,12 +146,13 @@ public class UserService{
 
     @Transactional
     public UserResponseDto makeUserBanned(String email) {
+        log.info("Find user with email to block: {}", email);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("User with email "
-                        + email + " not found"));
+                .orElseThrow(() -> new NotFoundException("User with email " + email + " not found"));
 
         user.setState(User.State.BANNED);
         userRepository.save(user);
+        log.info("User blocked: {}", user.getEmail());
 
         return UserResponseDto.from(user);
     }
@@ -187,18 +206,17 @@ public class UserService{
 
 
     public List<ConfirmationCode> findCodesByUser(String email) {
+        log.info("Find verification codes for user with email: {}", email);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("User with email "
-                        + email + " not found"));
-
+                .orElseThrow(() -> new NotFoundException("User with email " + email + " not found"));
         return confirmationCodeRepository.findByUser(user);
     }
 
 
 
     public void deleteUserById(Long userId) {
-        // Удаление пользователя по id
-         userRepository.deleteById(userId);
+        log.info("Deleting a user from ID: {}", userId);
+        userRepository.deleteById(userId);
     }
 
 
