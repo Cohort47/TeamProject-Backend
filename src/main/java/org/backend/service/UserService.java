@@ -179,6 +179,10 @@ public class UserService{
         return UserResponseDto.from(user);
     }
 
+
+
+
+
     public List<UserResponseDto> findAllFull() {
         return UserResponseDto.from(userRepository.findAll());
     }
