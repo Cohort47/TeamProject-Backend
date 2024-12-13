@@ -1,9 +1,6 @@
 package org.backend.controller;
 
 
-
-
-
 import lombok.RequiredArgsConstructor;
 import org.backend.controller.api.AdminApi;
 import org.backend.dto.BookingDto.BookingResponseDto;
@@ -37,7 +34,8 @@ public class AdminController implements AdminApi {
 
     @Override
     public ResponseEntity<List<UserResponseDto>> deleteUser(Long userId) {
-        userService.deleteUserById(userId);
+        boolean logicalDelete = false;
+        userService.deleteUserById(userId, logicalDelete);
         List<UserResponseDto> remainingUsers = userService.findAll();
         // Обновленный список пользователей
          return ResponseEntity.ok(remainingUsers);

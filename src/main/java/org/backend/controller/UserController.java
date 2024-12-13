@@ -11,11 +11,15 @@ import org.backend.service.BookingService;
 import org.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Collections;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/users")
 public class UserController implements UserApi {
 
     private final UserService userService;
@@ -33,4 +37,22 @@ public class UserController implements UserApi {
         return ResponseEntity.ok(updatedUser);
     }
 
-}
+
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<List<UserResponseDto>> deleteUser(@PathVariable Long userId, @RequestParam boolean logicalDelete) {
+            try {
+                userService.deleteUserById(userId, logicalDelete);
+                List<UserResponseDto> remainingUsers = userService.findAll();
+                // Обновляю список пользователей
+                return ResponseEntity.ok(remainingUsers);
+            } catch (ResponseStatusException e) {
+                // Возвращаю понятное сообщение об ошибке, если удаление не выполнено
+                return ResponseEntity.status(e.getStatusCode())
+                        .body(Collections.singletonList(new UserResponseDto().setErrorMessage(e.getReason())));
+            }
+        }
+
+    }
+
+

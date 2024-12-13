@@ -1,6 +1,5 @@
 package org.backend.service;
 
-
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +13,7 @@ import org.backend.repository.UserRepository;
 import org.backend.service.exception.AlreadyExistException;
 import org.backend.service.exception.NotFoundException;
 import org.backend.service.mail.MailUtil;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,9 +84,6 @@ public class UserService{
         return UserResponseDto.from(user);
     }
 
-
-
-
     private void sendEmail(User user, String code) {
         String link = "http://localhost:8080/api/public/confirm?code=" + code;
         log.info("Sending email to user: {} {}", user.getFirstName(), user.getLastName());
@@ -103,7 +100,6 @@ public class UserService{
             log.error("Error sending email: {}", e.getMessage(), e);
         }
     }
-
 
     private void saveConfirmCode(User newUser, String codeUUID) {
         log.info("Generate a verification code for the user: {}", newUser.getEmail());
@@ -122,8 +118,6 @@ public class UserService{
             throw new IllegalStateException("Failed to save verification code for user: " + newUser.getEmail(), e);
         }
     }
-
-
 
     @Transactional
     public UserResponseDto confirmation(String confirmCode) {
@@ -144,8 +138,6 @@ public class UserService{
 
         return UserResponseDto.from(user);
     }
-
-
 
     public List<UserResponseDto> findAll() {
         return UserResponseDto.from(userRepository.findAll());
@@ -178,10 +170,6 @@ public class UserService{
 
         return UserResponseDto.from(user);
     }
-
-
-
-
 
     public List<UserResponseDto> findAllFull() {
         return UserResponseDto.from(userRepository.findAll());
@@ -229,8 +217,6 @@ public class UserService{
         return UserResponseDto.from(updatedUser);
     }
 
-
-
     public List<ConfirmationCode> findCodesByUser(String email) {
         log.info("Find verification codes for user with email: {}", email);
         User user = userRepository.findByEmail(email)
@@ -239,12 +225,31 @@ public class UserService{
     }
 
 
+    @Transactional
+    public void deleteUserById(Long userId, boolean logicalDelete) {
+        log.info("Deleting a user with ID: {}", userId);
 
-    public void deleteUserById(Long userId) {
-        log.info("Deleting a user from ID: {}", userId);
-        userRepository.deleteById(userId);
+        if (logicalDelete) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new NotFoundException("User with ID " + userId + " not found"));
+
+            user.setDeleted(true);
+            userRepository.save(user);
+
+            log.info("User with ID: {} marked as deleted", userId);
+        } else {
+            try {
+                // Удаление пользователя по ID (каскадное удаление заботится о связанных записях)
+                userRepository.deleteById(userId);
+                log.info("User with ID: {} successfully deleted", userId);
+            } catch (DataIntegrityViolationException e) {
+                log.error("Cannot delete user with ID: {}. Dependent records exist.", userId, e);
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "Cannot delete user: dependent records exist in the confirmation_code table. " +
+                                "Please remove dependencies first.");
+            }
+        }
     }
-
 
 }
 

@@ -20,6 +20,7 @@ public class UserResponseDto {
     private String email;
     private String role;
     private boolean isBanned;
+    private String errorMessage; // Поле для сообщений об ошибках
 
     public static UserResponseDto from(User user) {
         return UserResponseDto.builder()
@@ -36,5 +37,10 @@ public class UserResponseDto {
         return users.stream()
                 .map(UserResponseDto::from)
                 .toList();
+    }
+
+    public UserResponseDto setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+        return this;
     }
 }
