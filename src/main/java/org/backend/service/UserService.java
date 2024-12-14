@@ -69,7 +69,7 @@ public class UserService{
                 .firstName(newUser.getFirstName())
                 .lastName(newUser.getLastName())
                 .hashPassword(passwordEncoder.encode(newUser.getHashPassword()))
-                .state(User.State.CONFIRMED)
+                .state(User.State.NOT_CONFIRMED)
                 .role(User.Role.USER)
                 .build();
 
@@ -83,6 +83,7 @@ public class UserService{
 
         return UserResponseDto.from(user);
     }
+
 
     private void sendEmail(User user, String code) {
         String link = "http://localhost:8080/api/public/confirm?code=" + code;
@@ -125,7 +126,8 @@ public class UserService{
 
         ConfirmationCode code = confirmationCodeRepository
                 .findByCodeAndExpiredDateTimeAfter(confirmCode, LocalDateTime.now())
-                .orElseThrow(() -> new NotFoundException("Verification code not found or expired"));
+                .orElseThrow(() -> new NotFoundException("Verification code " +
+                        "not found or expired"));
 
         code.setConfirmed(true);
         confirmationCodeRepository.save(code);
@@ -162,7 +164,8 @@ public class UserService{
     public UserResponseDto makeUserBanned(String email) {
         log.info("Find user with email to block: {}", email);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("User with email " + email + " not found"));
+                .orElseThrow(() -> new NotFoundException("User with email " +
+                        email + " not found"));
 
         user.setState(User.State.BANNED);
         userRepository.save(user);
@@ -220,7 +223,8 @@ public class UserService{
     public List<ConfirmationCode> findCodesByUser(String email) {
         log.info("Find verification codes for user with email: {}", email);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("User with email " + email + " not found"));
+                .orElseThrow(() -> new NotFoundException("User with email " +
+                        email + " not found"));
         return confirmationCodeRepository.findByUser(user);
     }
 
@@ -231,7 +235,8 @@ public class UserService{
 
         if (logicalDelete) {
             User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new NotFoundException("User with ID " + userId + " not found"));
+                    .orElseThrow(() -> new NotFoundException("User with ID " +
+                            userId + " not found"));
 
             user.setDeleted(true);
             userRepository.save(user);
@@ -239,7 +244,7 @@ public class UserService{
             log.info("User with ID: {} marked as deleted", userId);
         } else {
             try {
-                // Удаление пользователя по ID (каскадное удаление заботится о связанных записях)
+                // Удаляю пользователя по ID (каскадное удаление= заботится о связанных записях)
                 userRepository.deleteById(userId);
                 log.info("User with ID: {} successfully deleted", userId);
             } catch (DataIntegrityViolationException e) {

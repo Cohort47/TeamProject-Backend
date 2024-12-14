@@ -49,7 +49,7 @@ public class MailUtil {
             helper.setSubject(subject);
             helper.setText(createConfirmationMail(firstName, lastName, link), true);
             javaMailSender.send(message);
-            log.info("Email successfully sent to {}", email); // Добавил логирование успешной отправки
+            log.info("Email successfully sent to {}", email); // Добавила логирование успешной отправки
         } catch (MessagingException e) {
             log.error("Error while sending email: {}", e.getMessage(), e);
             throw new IllegalStateException(e);
