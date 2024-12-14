@@ -84,7 +84,6 @@ public class UserService{
         return UserResponseDto.from(user);
     }
 
-
     private void sendEmail(User user, String code) {
         String link = "http://localhost:8080/api/public/confirm?code=" + code;
         log.info("Sending email to user: {} {}", user.getFirstName(), user.getLastName());
@@ -158,7 +157,6 @@ public class UserService{
                         + email + " not found"));
         return UserResponseDto.from(user);
     }
-
 
     @Transactional
     public UserResponseDto makeUserBanned(String email) {
@@ -255,7 +253,6 @@ public class UserService{
             }
         }
     }
-
 }
 
 
