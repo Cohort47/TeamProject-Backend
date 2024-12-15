@@ -30,14 +30,14 @@ AuthController implements AuthApi {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getUserEmail(),
+                        request.getEmail(),
                         request.getPassword()
                 )
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String jwt = tokenProvider.createToken(request.getUserEmail());
+        String jwt = tokenProvider.createToken(request.getEmail());
 
         return new ResponseEntity<>(new AuthResponse(jwt), HttpStatus.OK);
     }
