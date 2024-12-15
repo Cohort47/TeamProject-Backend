@@ -33,7 +33,5 @@ public interface UserApi {
     @PutMapping()
     ResponseEntity<UserResponseDto> updateUser(@RequestBody UserRequestDto updateRequest);
 
-//    @GetMapping("/bookings/{userId}")
-//    ResponseEntity<List<BookingResponseDto>> getBookingsByUser(@PathVariable Long userId);
 
 }

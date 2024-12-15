@@ -1,6 +1,5 @@
 package org.backend.service;
 
-
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -14,10 +13,15 @@ import org.backend.repository.UserRepository;
 import org.backend.service.exception.AlreadyExistException;
 import org.backend.service.exception.NotFoundException;
 import org.backend.service.mail.MailUtil;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
+
+import java.util.regex.Pattern;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -31,81 +35,110 @@ public class UserService{
     private final MailUtil mailUtil;
     private final PasswordEncoder passwordEncoder;
 
-
     @Transactional
     public UserResponseDto registration(UserRequestDto newUser) {
+        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
+        Pattern emailPattern = Pattern.compile(emailRegex);
 
-        if (userRepository.existsByEmail(newUser.getEmail())) {
-            throw new AlreadyExistException("User with email: "
-                            + newUser.getEmail() + " already registered");
+        String passwordRegex = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@#$%^&+=!])[A-Za-z\\d@#$%^&+=!]{8,20}$";
+        Pattern passwordPattern = Pattern.compile(passwordRegex);
+
+        if (newUser.getEmail() == null || newUser.getEmail().isEmpty() ||
+                newUser.getFirstName() == null || newUser.getFirstName().isEmpty() ||
+                newUser.getLastName() == null || newUser.getLastName().isEmpty() ||
+                newUser.getHashPassword() == null || newUser.getHashPassword().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "All fields are required");
         }
 
+        if (!emailPattern.matcher(newUser.getEmail()).matches()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid email format");
+        }
+
+        if (!passwordPattern.matcher(newUser.getHashPassword()).matches()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password " +
+                    "must be 8-20 characters long, contain at least one letter, " +
+                    "one number, and one special character (@#$%^&+=!)");
+        }
+
+        if (userRepository.existsByEmail(newUser.getEmail())) {
+            throw new AlreadyExistException("User with email: " + newUser.getEmail() + " already registered");
+        }
 
         User user = User.builder()
-
                 .email(newUser.getEmail())
                 .firstName(newUser.getFirstName())
                 .lastName(newUser.getLastName())
                 .hashPassword(passwordEncoder.encode(newUser.getHashPassword()))
-                .state(User.State.CONFIRMED)
+                .state(User.State.NOT_CONFIRMED)
                 .role(User.Role.USER)
                 .build();
 
         userRepository.save(user);
 
         String code = UUID.randomUUID().toString();
-
         saveConfirmCode(user, code);
 
         // отправка кода по электронной почте
-
-        //sendEmail(user,code);
+        // sendEmail(user, code);
 
         return UserResponseDto.from(user);
-
     }
 
     private void sendEmail(User user, String code) {
         String link = "http://localhost:8080/api/public/confirm?code=" + code;
-//        log.info("ссылка для отправки email: {}", link);
-        mailUtil.send(
-                user.getFirstName(),
-                user.getLastName(),
-                link,
-                "Code confirmation email",
-                user.getEmail());
+        log.info("Sending email to user: {} {}", user.getFirstName(), user.getLastName());
+        log.info("Confirmation link: {}", link);
+        try {
+            mailUtil.send(
+                    user.getFirstName(),
+                    user.getLastName(),
+                    link,
+                    "Code confirmation email",
+                    user.getEmail());
+            log.info("Email successfully sent to user: {}", user.getEmail());
+        } catch (Exception e) {
+            log.error("Error sending email: {}", e.getMessage(), e);
+        }
     }
 
     private void saveConfirmCode(User newUser, String codeUUID) {
-        ConfirmationCode confirmationCode = ConfirmationCode.builder()
-                .code(codeUUID)
-                .user(newUser)
-                .expiredDateTime(LocalDateTime.now().plusDays(1))
-                .build();
+        log.info("Generate a verification code for the user: {}", newUser.getEmail());
 
-        confirmationCodeRepository.save(confirmationCode);
+        try {
+            ConfirmationCode confirmationCode = ConfirmationCode.builder()
+                    .code(codeUUID)
+                    .user(newUser)
+                    .expiredDateTime(LocalDateTime.now().plusDays(1))
+                    .build();
+
+            confirmationCodeRepository.save(confirmationCode);
+            log.info("The verification code has been successfully saved for the user.: {}", newUser.getEmail());
+        } catch (Exception e) {
+            log.error("Error saving verification code for user: {}", newUser.getEmail(), e);
+            throw new IllegalStateException("Failed to save verification code for user: " + newUser.getEmail(), e);
+        }
     }
-
 
     @Transactional
     public UserResponseDto confirmation(String confirmCode) {
+        log.info("Start of confirmation for code: {}", confirmCode);
 
         ConfirmationCode code = confirmationCodeRepository
                 .findByCodeAndExpiredDateTimeAfter(confirmCode, LocalDateTime.now())
-                .orElseThrow(() -> new NotFoundException(
-                        "Verification code not found or expired"));
+                .orElseThrow(() -> new NotFoundException("Verification code " +
+                        "not found or expired"));
 
         code.setConfirmed(true);
         confirmationCodeRepository.save(code);
+        log.info("The verification code has been successfully verified.: {}", confirmCode);
 
         User user = code.getUser();
         user.setState(User.State.CONFIRMED);
         userRepository.save(user);
+        log.info("User successfully verified: {}", user.getEmail());
 
         return UserResponseDto.from(user);
-
     }
-
 
     public List<UserResponseDto> findAll() {
         return UserResponseDto.from(userRepository.findAll());
@@ -125,15 +158,16 @@ public class UserService{
         return UserResponseDto.from(user);
     }
 
-
     @Transactional
     public UserResponseDto makeUserBanned(String email) {
+        log.info("Find user with email to block: {}", email);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("User with email "
-                        + email + " not found"));
+                .orElseThrow(() -> new NotFoundException("User with email " +
+                        email + " not found"));
 
         user.setState(User.State.BANNED);
         userRepository.save(user);
+        log.info("User blocked: {}", user.getEmail());
 
         return UserResponseDto.from(user);
     }
@@ -184,24 +218,41 @@ public class UserService{
         return UserResponseDto.from(updatedUser);
     }
 
-
-
     public List<ConfirmationCode> findCodesByUser(String email) {
+        log.info("Find verification codes for user with email: {}", email);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("User with email "
-                        + email + " not found"));
-
+                .orElseThrow(() -> new NotFoundException("User with email " +
+                        email + " not found"));
         return confirmationCodeRepository.findByUser(user);
     }
 
 
+    @Transactional
+    public void deleteUserById(Long userId, boolean logicalDelete) {
+        log.info("Deleting a user with ID: {}", userId);
 
-    public void deleteUserById(Long userId) {
-        // Удаление пользователя по id
-         userRepository.deleteById(userId);
+        if (logicalDelete) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new NotFoundException("User with ID " +
+                            userId + " not found"));
+
+            user.setDeleted(true);
+            userRepository.save(user);
+
+            log.info("User with ID: {} marked as deleted", userId);
+        } else {
+            try {
+                // Удаляю пользователя по ID (каскадное удаление= заботится о связанных записях)
+                userRepository.deleteById(userId);
+                log.info("User with ID: {} successfully deleted", userId);
+            } catch (DataIntegrityViolationException e) {
+                log.error("Cannot delete user with ID: {}. Dependent records exist.", userId, e);
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "Cannot delete user: dependent records exist in the confirmation_code table. " +
+                                "Please remove dependencies first.");
+            }
+        }
     }
-
-
 }
 
 

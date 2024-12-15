@@ -8,7 +8,6 @@ import org.backend.entity.User;
 
 import java.util.List;
 
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,7 +19,8 @@ public class UserResponseDto {
     private String lastName;
     private String email;
     private String role;
-
+    private boolean isBanned;
+    private String errorMessage; // Поле для сообщений об ошибках
 
     public static UserResponseDto from(User user) {
         return UserResponseDto.builder()
@@ -29,12 +29,18 @@ public class UserResponseDto {
                 .lastName(user.getLastName())
                 .email(user.getEmail())
                 .role(user.getRole().toString())
+                .isBanned(user.getState() == User.State.BANNED)
                 .build();
     }
-    public static List<UserResponseDto> from(List<User> users){
+
+    public static List<UserResponseDto> from(List<User> users) {
         return users.stream()
-                .map(user -> UserResponseDto.from(user))
+                .map(UserResponseDto::from)
                 .toList();
     }
 
+    public UserResponseDto setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+        return this;
+    }
 }

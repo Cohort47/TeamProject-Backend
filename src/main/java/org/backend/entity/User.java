@@ -17,6 +17,7 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name = "user", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
+
 public class User {
 
     public enum Role {
@@ -59,6 +60,9 @@ public class User {
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private State state;
+
+    @Column(nullable = false)
+    private boolean isDeleted = false;
 
     private String photoLink;
 
