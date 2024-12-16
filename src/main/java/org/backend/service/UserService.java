@@ -46,7 +46,7 @@ public class UserService{
                 .email(newUser.getEmail())
                 .firstName(newUser.getFirstName())
                 .lastName(newUser.getLastName())
-                .hashPassword(passwordEncoder.encode(newUser.getHashPassword()))
+                .password(passwordEncoder.encode(newUser.getPassword()))
                 .state(User.State.CONFIRMED)
                 .role(User.Role.USER)
                 .build();
@@ -151,7 +151,7 @@ public class UserService{
         existingUser.setFirstName(updateRequest.getFirstName() != null ? updateRequest.getFirstName() : existingUser.getFirstName());
         existingUser.setLastName(updateRequest.getLastName() != null ? updateRequest.getLastName() : existingUser.getLastName());
         existingUser.setEmail(updateRequest.getEmail() != null ? updateRequest.getEmail() : existingUser.getEmail());
-        existingUser.setHashPassword(updateRequest.getHashPassword() != null ? updateRequest.getHashPassword() : existingUser.getHashPassword());
+        existingUser.setPassword(updateRequest.getPassword() != null ? updateRequest.getPassword() : existingUser.getPassword());
 
         // Сохраняем обновленные данные пользователя в базу данных
         User updatedUser = userRepository.save(existingUser);
