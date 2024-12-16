@@ -25,7 +25,7 @@ public class UserRequestDto {
     private String email;
 
     @NotBlank (message = "User password should not be empty")
-    private String hashPassword;
+    private String password;
 
     private String photoLinks;
 
